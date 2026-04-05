@@ -453,16 +453,18 @@ document.querySelector(".checkout-btn").addEventListener("click", () => {
   text += `💰 ИТОГО: ${total} ₽`;
 
   // 🔥 отправка
-  fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      chat_id: CHAT_ID,
-      text: text
-    })
+  fetch("https://rbc-store.onrender.com/order", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    name,
+    phone,
+    address,
+    cart
   })
+})
   .then(() => {
 
     document.getElementById("success-modal").style.display = "flex";

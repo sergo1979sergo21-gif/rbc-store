@@ -1,3 +1,4 @@
+import fs from "fs";
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
@@ -7,11 +8,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 👉 твои данные
-const TELEGRAM_TOKEN = "8633471473:AAHBKp17NO60xf4XKk8HVSbWEpe0yEDfd4E";
-const CHAT_ID = "8410151779";
-
-// 👉 маршрут заказа
+/* =========================
+   📦 СОЗДАНИЕ ЗАКАЗА
+========================= */
 app.post("/order", async (req, res) => {
 
   const { name, phone, address, cart } = req.body;
@@ -33,24 +32,69 @@ app.post("/order", async (req, res) => {
 
   text += `💰 ИТОГО: ${total} ₽`;
 
+  /* =========================
+     💾 СОХРАНЕНИЕ В ФАЙЛ
+  ========================= */
+  const newOrder = {
+    id: Date.now(),
+    name,
+    phone,
+    address,
+    cart,
+    total,
+    date: new Date().toLocaleString()
+  };
+
+  let orders = [];
+
   try {
-    await fetch("http://localhost:3000/order", {
+    const data = fs.readFileSync("orders.json", "utf8");
+    orders = JSON.parse(data);
+  } catch {}
+
+  orders.push(newOrder);
+
+  fs.writeFileSync("orders.json", JSON.stringify(orders, null, 2));
+
+  /* =========================
+     📩 ОТПРАВКА В TELEGRAM
+  ========================= */
+  try {
+    await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        chat_id: process.env.CHAT_ID,
+        text: text
       })
     });
 
     res.json({ success: true });
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false });
   }
 
 });
 
+/* =========================
+   📊 ПОЛУЧЕНИЕ ЗАКАЗОВ
+========================= */
+app.get("/orders", (req, res) => {
+  try {
+    const data = fs.readFileSync("orders.json", "utf8");
+    res.json(JSON.parse(data));
+  } catch {
+    res.json([]);
+  }
+});
+
+/* =========================
+   🚀 ЗАПУСК СЕРВЕРА
+========================= */
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

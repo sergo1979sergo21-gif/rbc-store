@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Админка</title>
+</head>
+<body>
+
+<h1>📦 Заказы</h1>
+<div id="orders"></div>
+
+<script>
+fetch("https://rbc-store.onrender.com/orders")
+  .then(res => res.json())
+  .then(data => {
+
+    const container = document.getElementById("orders");
+
+    data.reverse().forEach(order => {
+      const div = document.createElement("div");
+
+      div.style.border = "1px solid #ccc";
+      div.style.margin = "10px";
+      div.style.padding = "10px";
+
+      div.innerHTML = `
+        <h3>Заказ #${order.id}</h3>
+        <p>👤 ${order.name}</p>
+        <p>📞 ${order.phone}</p>
+        <p>📍 ${order.address}</p>
+        <p>💰 ${order.total} ₽</p>
+        <p>📅 ${order.date}</p>
+      `;
+
+      container.appendChild(div);
+    });
+
+  });
+</script>
+
+</body>
+</html>

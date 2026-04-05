@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>RBC Store</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="image/logo_3.webp">
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">RBC</div>
+
+  <nav class="nav">
+    <a href="#products" class="nav-shop">Магазин</a>
+ <button class="nav-cart">
+  <span class="cart-text">Корзина</span>
+  
+  
+  
+  
+  <span id="cart-count">0</span>
+</button>
+  </nav>
+
+  <div class="controls">
+    <button onclick="setLang('ru')">RU</button>
+    <button onclick="setLang('en')">EN</button>
+  </div>
+</header>
+
+<section class="hero">
+ <video autoplay muted loop playsinline class="hero-video">
+  <source src="video/gym.mp4" type="video/mp4">
+</video>
+
+  <div class="hero-content">
+    <h2 class="hero-text"></h2>
+    <button class="buy-btn"></button>
+  </div>
+</section>
+
+<section class="products" id="products"></section>
+
+<div id="modal" class="modal">
+  <div class="modal-content">
+
+    <span class="close">&times;</span>
+
+   <div class="modal-image-wrapper">
+  <img id="modal-img">
+
+  <button id="prev" class="arrow left">‹</button>
+  <button id="next" class="arrow right">›</button>
+</div>
+
+    <h2 id="modal-title"></h2>
+    <p id="modal-price"></p>
+
+    <div class="options">
+
+      <div class="sizes">
+        <p>Размер:</p>
+        <button>S</button>
+        <button>M</button>
+        <button>L</button>
+      </div>
+
+      <div class="colors">
+        <p>Цвет:</p>
+        <button class="color black"></button>
+        <button class="color red"></button>
+        <button class="color white"></button>
+      </div>
+
+    </div>
+
+    <button id="modal-buy"  class="main-buy" disabled>
+      В КОРЗИНУ
+    </button>
+
+  </div> <!-- ✅ modal-content -->
+</div> 
+
+<div id="overlay" class="overlay"></div>
+
+<div id="cart" class="cart">
+  <div class="cart-header">
+    <h2>Корзина</h2>
+    <span id="close-cart">✕</span>
+  </div>
+
+  <div id="cart-items"></div>
+
+  <div class="cart-footer">
+    <button id="clear-cart">Очистить</button>
+    <p id="cart-total">Итого: 0 ₽</p>
+  </div>
+
+  <input id="customer-name" placeholder="Ваше имя" />
+<input id="customer-phone" placeholder="Телефон" />
+<input id="customer-address" placeholder="Адрес доставки">
+  <button class="checkout-btn">Оформить заказ</button>
+
+</div>
+
+<div id="success-modal" class="success-modal">
+  <div class="success-content">
+    <h2>✅ Заказ отправлен</h2>
+    <p>Мы скоро свяжемся с вами</p>
+    <button onclick="closeSuccess()">ОК</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>

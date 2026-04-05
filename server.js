@@ -1,3 +1,4 @@
+import fs from "fs";
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
@@ -7,7 +8,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 👉 маршрут заказа
+/* =========================
+   📦 СОЗДАНИЕ ЗАКАЗА
+========================= */
 app.post("/order", async (req, res) => {
 
   const { name, phone, address, cart } = req.body;
@@ -29,6 +32,33 @@ app.post("/order", async (req, res) => {
 
   text += `💰 ИТОГО: ${total} ₽`;
 
+  /* =========================
+     💾 СОХРАНЕНИЕ В ФАЙЛ
+  ========================= */
+  const newOrder = {
+    id: Date.now(),
+    name,
+    phone,
+    address,
+    cart,
+    total,
+    date: new Date().toLocaleString()
+  };
+
+  let orders = [];
+
+  try {
+    const data = fs.readFileSync("orders.json", "utf8");
+    orders = JSON.parse(data);
+  } catch {}
+
+  orders.push(newOrder);
+
+  fs.writeFileSync("orders.json", JSON.stringify(orders, null, 2));
+
+  /* =========================
+     📩 ОТПРАВКА В TELEGRAM
+  ========================= */
   try {
     await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
       method: "POST",
@@ -50,7 +80,21 @@ app.post("/order", async (req, res) => {
 
 });
 
-// 👉 ВОТ ТУТ ДОЛЖЕН БЫТЬ сервер
+/* =========================
+   📊 ПОЛУЧЕНИЕ ЗАКАЗОВ
+========================= */
+app.get("/orders", (req, res) => {
+  try {
+    const data = fs.readFileSync("orders.json", "utf8");
+    res.json(JSON.parse(data));
+  } catch {
+    res.json([]);
+  }
+});
+
+/* =========================
+   🚀 ЗАПУСК СЕРВЕРА
+========================= */
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

@@ -127,7 +127,7 @@ function renderProducts() {
           <img src="${product.hoverImg}" class="hover-img">
         </div>
 
-        <div class="like-btn">❤</div>
+        <div class="like-btn ${favorites.includes(product.name) ? 'active' : ''}">❤</div>
 
         <div class="product-info">
           <h3>${product.name}</h3>
@@ -199,6 +199,7 @@ function addToCart(id, size, color) {
 
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCartCount();
+  showToast("Добавлено в корзину");
 }
 
 function checkSelection() {
@@ -402,14 +403,21 @@ document.getElementById("clear-cart").addEventListener("click", () => {
 document.querySelector(".checkout-btn").addEventListener("click", () => {
 
   const btn = document.querySelector(".checkout-btn");
-btn.disabled = true;
 
+  if (btn.disabled) return; // 🔥 защита от спама
+
+  btn.disabled = true;
+  btn.innerText = "Отправка..."; // 🔥 loading
+
+  // 👉 корзина пустая
   if (cart.length === 0) {
     alert("Корзина пуста");
+    btn.disabled = false;
+    btn.innerText = "Оформить заказ";
     return;
   }
 
-  // 👉 получаем данные
+  // 👉 данные
   const name = document.getElementById("customer-name").value;
   const phone = document.getElementById("customer-phone").value;
   const address = document.getElementById("customer-address").value;
@@ -417,22 +425,34 @@ btn.disabled = true;
   // 👉 проверка
   if (!name || !phone || !address) {
     alert("Заполните все поля");
+    btn.disabled = false;
+    btn.innerText = "Оформить заказ";
     return;
   }
 
-  let text = `🛒 Новый заказ:\n\n`;
+  // 🔥 ID заказа
+  const orderId = Date.now();
+
+  let text = `📦 Заказ №${orderId}\n\n`;
   text += `👤 Имя: ${name}\n`;
   text += `📞 Телефон: ${phone}\n`;
   text += `📍 Адрес: ${address}\n\n`;
 
+  let total = 0;
+
   cart.forEach(item => {
+    total += item.price * item.qty;
+
     text += `${item.name}\n`;
     text += `Размер: ${item.size}\n`;
     text += `Цвет: ${item.color}\n`;
-    text += `Цена: ${item.price} ₽\n\n`;
+    text += `Кол-во: ${item.qty}\n`;
+    text += `Цена: ${item.price * item.qty} ₽\n\n`;
   });
 
-  // 🔥 ОТПРАВКА
+  text += `💰 ИТОГО: ${total} ₽`;
+
+  // 🔥 отправка
   fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
     method: "POST",
     headers: {
@@ -445,30 +465,31 @@ btn.disabled = true;
   })
   .then(() => {
 
-   document.getElementById("success-modal").style.display = "flex";
+    document.getElementById("success-modal").style.display = "flex";
 
-    // 🧹 очистка
+    // очистка
     cart = [];
     localStorage.setItem("cart", JSON.stringify(cart));
 
     updateCartCount();
     renderCart();
 
-
-    // 👉 очистка полей
+    // очистка полей
     document.getElementById("customer-name").value = "";
     document.getElementById("customer-phone").value = "";
     document.getElementById("customer-address").value = "";
 
     btn.disabled = false;
-    
+    btn.innerText = "Оформить заказ";
+
     closeCart();
-  window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
   })
   .catch(() => {
     alert("Ошибка отправки 😢");
     btn.disabled = false;
+    btn.innerText = "Оформить заказ";
   });
 
 });
@@ -536,6 +557,43 @@ function changeQty(index, delta) {
   updateCartCount();
   renderCart();
 }
+
+function showToast(text) {
+  const toast = document.getElementById("toast");
+  toast.innerText = text;
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2000);
+}
+
+let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("like-btn")) {
+
+    const card = e.target.closest(".product-card");
+    const name = card.querySelector("h3").innerText;
+
+    if (favorites.includes(name)) {
+      favorites = favorites.filter(f => f !== name);
+      e.target.classList.remove("active");
+    } else {
+      favorites.push(name);
+      e.target.classList.add("active");
+    }
+
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }
+});
+
+const burger = document.querySelector(".burger");
+const nav = document.querySelector("nav");
+
+burger.addEventListener("click", () => {
+  nav.classList.toggle("active");
+});
 
 // 👉 СТАРТ
 updateText();

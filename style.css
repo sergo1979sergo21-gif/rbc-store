@@ -307,12 +307,15 @@ nav a:hover::after,
 .cart {
   position: fixed;
   top: 0;
-  right: -350px;
+  right: 0; /* 🔥 ВАЖНО */
   width: 350px;
+  max-width: 100%;
   height: 100vh;
   background: #111;
 
+  transform: translateX(100%); /* 👉 вместо right */
   transition: 0.3s;
+
   z-index: 99999;
 
   display: flex;
@@ -320,7 +323,7 @@ nav a:hover::after,
 }
 
 .cart.active {
-  right: 0;
+  transform: translateX(0); /* 👉 показываем */
 }
 
 /* header */
@@ -964,31 +967,95 @@ body.no-scroll {
   box-shadow: none;
 }
 
+/* ====== СЕТКА ТОВАРОВ ====== */
+#products {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* ====== 📱 МОБИЛКА ====== */
 @media (max-width: 768px) {
+
+  /* шапка */
   header {
     flex-direction: column;
     align-items: center;
+  }
+
+  .nav {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    padding: 10px;
   }
 
   nav {
     margin: 10px 0;
   }
 
+  /* hero */
   .hero-text {
-    font-size: 32px;
+    font-size: 28px;
+    text-align: center;
   }
-}
 
-@media (max-width: 768px) {
+  /* товары */
+  #products {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 15px;
+  }
+
   .product-card {
     width: 100%;
   }
 
+  /* модалка */
   .modal-content {
     width: 90%;
   }
 
-  .nav {
-    flex-direction: column;
+  /* корзина */
+  .cart {
+    width: 100%;
   }
+
+  /* форма */
+  .checkout-form input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .checkout-btn {
+    width: 100%;
+  }
+
+}
+
+.burger {
+  display: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* мобилка */
+@media (max-width: 768px) {
+
+  .burger {
+    display: block;
+  }
+
+  nav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  nav.active {
+    display: flex;
+  }
+
 }

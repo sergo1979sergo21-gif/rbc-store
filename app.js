@@ -404,12 +404,11 @@ document.querySelector(".checkout-btn").addEventListener("click", () => {
 
   const btn = document.querySelector(".checkout-btn");
 
-  if (btn.disabled) return; // 🔥 защита от спама
+  if (btn.disabled) return;
 
   btn.disabled = true;
-  btn.innerText = "Отправка..."; // 🔥 loading
+  btn.innerText = "Переход к оплате...";
 
-  // 👉 корзина пустая
   if (cart.length === 0) {
     alert("Корзина пуста");
     btn.disabled = false;
@@ -417,12 +416,10 @@ document.querySelector(".checkout-btn").addEventListener("click", () => {
     return;
   }
 
-  // 👉 данные
   const name = document.getElementById("customer-name").value;
   const phone = document.getElementById("customer-phone").value;
   const address = document.getElementById("customer-address").value;
 
-  // 👉 проверка
   if (!name || !phone || !address) {
     alert("Заполните все поля");
     btn.disabled = false;
@@ -430,66 +427,26 @@ document.querySelector(".checkout-btn").addEventListener("click", () => {
     return;
   }
 
-  // 🔥 ID заказа
-  const orderId = Date.now();
-
-  let text = `📦 Заказ №${orderId}\n\n`;
-  text += `👤 Имя: ${name}\n`;
-  text += `📞 Телефон: ${phone}\n`;
-  text += `📍 Адрес: ${address}\n\n`;
-
-  let total = 0;
-
-  cart.forEach(item => {
-    total += item.price * item.qty;
-
-    text += `${item.name}\n`;
-    text += `Размер: ${item.size}\n`;
-    text += `Цвет: ${item.color}\n`;
-    text += `Кол-во: ${item.qty}\n`;
-    text += `Цена: ${item.price * item.qty} ₽\n\n`;
-  });
-
-  text += `💰 ИТОГО: ${total} ₽`;
-
-  // 🔥 отправка
-  fetch("https://rbc-store.onrender.com/order", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    name,
-    phone,
-    address,
-    cart
+  // 👉 отправка в backend для Stripe
+  fetch("https://rbc-store.onrender.com/create-checkout-session", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      cart,
+      name,
+      phone,
+      address
+    })
   })
-})
-  .then(() => {
-
-    document.getElementById("success-modal").style.display = "flex";
-
-    // очистка
-    cart = [];
-    localStorage.setItem("cart", JSON.stringify(cart));
-
-    updateCartCount();
-    renderCart();
-
-    // очистка полей
-    document.getElementById("customer-name").value = "";
-    document.getElementById("customer-phone").value = "";
-    document.getElementById("customer-address").value = "";
-
-    btn.disabled = false;
-    btn.innerText = "Оформить заказ";
-
-    closeCart();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-
+  .then(res => res.json())
+  .then(data => {
+    // 👉 редирект на оплату
+    window.location.href = data.url;
   })
   .catch(() => {
-    alert("Ошибка отправки 😢");
+    alert("Ошибка оплаты 😢");
     btn.disabled = false;
     btn.innerText = "Оформить заказ";
   });

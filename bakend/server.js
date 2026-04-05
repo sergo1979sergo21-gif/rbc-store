@@ -2,11 +2,14 @@ import fs from "fs";
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
+import Stripe from "stripe";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 /* =========================
    📦 СОЗДАНИЕ ЗАКАЗА
@@ -32,9 +35,7 @@ app.post("/order", async (req, res) => {
 
   text += `💰 ИТОГО: ${total} ₽`;
 
-  /* =========================
-     💾 СОХРАНЕНИЕ В ФАЙЛ
-  ========================= */
+  // 💾 сохраняем заказ
   const newOrder = {
     id: Date.now(),
     name,
@@ -56,9 +57,7 @@ app.post("/order", async (req, res) => {
 
   fs.writeFileSync("orders.json", JSON.stringify(orders, null, 2));
 
-  /* =========================
-     📩 ОТПРАВКА В TELEGRAM
-  ========================= */
+  // 📩 Telegram
   try {
     await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
       method: "POST",
@@ -81,6 +80,51 @@ app.post("/order", async (req, res) => {
 });
 
 /* =========================
+   💳 STRIPE ОПЛАТА
+========================= */
+app.post("/create-checkout-session", async (req, res) => {
+
+  const { cart, name, phone, address } = req.body;
+
+  try {
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+
+      line_items: cart.map(item => ({
+        price_data: {
+          currency: "rub",
+          product_data: {
+            name: item.name
+          },
+          unit_amount: item.price * 100
+        },
+        quantity: item.qty
+      })),
+
+      success_url: "https://rbc-store.onrender.com/success",
+      cancel_url: "https://rbc-store.onrender.com/cancel",
+
+      metadata: {
+        name,
+        phone,
+        address,
+        cart: JSON.stringify(cart)
+      }
+
+    });
+
+    res.json({ url: session.url });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Stripe error" });
+  }
+
+});
+
+/* =========================
    📊 ПОЛУЧЕНИЕ ЗАКАЗОВ
 ========================= */
 app.get("/orders", (req, res) => {
@@ -92,12 +136,26 @@ app.get("/orders", (req, res) => {
   }
 });
 
-app.get("/", (req, res) => {
-  res.send("SERVER WORKS");
+/* =========================
+   ✅ СТРАНИЦЫ ПОСЛЕ ОПЛАТЫ
+========================= */
+app.get("/success", (req, res) => {
+  res.send("Оплата прошла успешно ✅");
+});
+
+app.get("/cancel", (req, res) => {
+  res.send("Оплата отменена ❌");
 });
 
 /* =========================
-   🚀 ЗАПУСК СЕРВЕРА
+   🔥 ПРОВЕРКА СЕРВЕРА
+========================= */
+app.get("/", (req, res) => {
+  res.send("SERVER WORKS 🚀");
+});
+
+/* =========================
+   🚀 ЗАПУСК
 ========================= */
 const PORT = process.env.PORT || 3000;
 

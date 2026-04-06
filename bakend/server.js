@@ -7,80 +7,15 @@ import Stripe from "stripe";
 const app = express();
 
 app.use(cors());
+
+// 🔥 ВАЖНО: для webhook
+app.use("/webhook", express.raw({ type: "application/json" }));
 app.use(express.json());
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 /* =========================
-   📦 СОЗДАНИЕ ЗАКАЗА
-========================= */
-app.post("/order", async (req, res) => {
-
-  const { name, phone, address, cart } = req.body;
-
-  let text = `📦 Новый заказ\n\n`;
-  text += `👤 ${name}\n📞 ${phone}\n📍 ${address}\n\n`;
-
-  let total = 0;
-
-  cart.forEach(item => {
-    total += item.price * item.qty;
-
-    text += `${item.name}\n`;
-    text += `Размер: ${item.size}\n`;
-    text += `Цвет: ${item.color}\n`;
-    text += `Кол-во: ${item.qty}\n`;
-    text += `Цена: ${item.price * item.qty} ₽\n\n`;
-  });
-
-  text += `💰 ИТОГО: ${total} ₽`;
-
-  // 💾 сохраняем заказ
-  const newOrder = {
-    id: Date.now(),
-    name,
-    phone,
-    address,
-    cart,
-    total,
-    date: new Date().toLocaleString()
-  };
-
-  let orders = [];
-
-  try {
-    const data = fs.readFileSync("orders.json", "utf8");
-    orders = JSON.parse(data);
-  } catch {}
-
-  orders.push(newOrder);
-
-  fs.writeFileSync("orders.json", JSON.stringify(orders, null, 2));
-
-  // 📩 Telegram
-  try {
-    await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        chat_id: process.env.CHAT_ID,
-        text: text
-      })
-    });
-
-    res.json({ success: true });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false });
-  }
-
-});
-
-/* =========================
-   💳 STRIPE ОПЛАТА
+   💳 СОЗДАНИЕ СЕССИИ ОПЛАТЫ
 ========================= */
 app.post("/create-checkout-session", async (req, res) => {
 
@@ -112,7 +47,6 @@ app.post("/create-checkout-session", async (req, res) => {
         address,
         cart: JSON.stringify(cart)
       }
-
     });
 
     res.json({ url: session.url });
@@ -122,6 +56,92 @@ app.post("/create-checkout-session", async (req, res) => {
     res.status(500).json({ error: "Stripe error" });
   }
 
+});
+
+/* =========================
+   💳 WEBHOOK (ПОСЛЕ ОПЛАТЫ)
+========================= */
+app.post("/webhook", (req, res) => {
+
+  const sig = req.headers["stripe-signature"];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.log("❌ Webhook error:", err.message);
+    return res.sendStatus(400);
+  }
+
+  if (event.type === "checkout.session.completed") {
+
+    const session = event.data.object;
+
+    const name = session.metadata.name;
+    const phone = session.metadata.phone;
+    const address = session.metadata.address;
+    const cart = JSON.parse(session.metadata.cart);
+
+    let total = 0;
+    let text = `✅ ОПЛАЧЕННЫЙ ЗАКАЗ\n\n`;
+
+    text += `👤 ${name}\n📞 ${phone}\n📍 ${address}\n\n`;
+
+    cart.forEach(item => {
+      total += item.price * item.qty;
+
+      text += `${item.name}\n`;
+      text += `Размер: ${item.size}\n`;
+      text += `Цвет: ${item.color}\n`;
+      text += `Кол-во: ${item.qty}\n`;
+      text += `Цена: ${item.price * item.qty} ₽\n\n`;
+    });
+
+    text += `💰 ИТОГО: ${total} ₽`;
+
+    // 💾 сохраняем заказ
+    const newOrder = {
+      id: Date.now(),
+      name,
+      phone,
+      address,
+      cart,
+      total,
+      date: new Date().toLocaleString()
+    };
+
+    let orders = [];
+
+    try {
+      const data = fs.readFileSync("orders.json", "utf8");
+      orders = JSON.parse(data);
+    } catch {}
+
+    orders.push(newOrder);
+
+    fs.writeFileSync("orders.json", JSON.stringify(orders, null, 2));
+
+    // 📩 Telegram
+    fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        chat_id: process.env.CHAT_ID,
+        text: text
+      })
+    });
+
+    console.log("✅ Оплата прошла, заказ сохранён");
+  }
+
+  res.sendStatus(200);
 });
 
 /* =========================
@@ -137,7 +157,7 @@ app.get("/orders", (req, res) => {
 });
 
 /* =========================
-   ✅ СТРАНИЦЫ ПОСЛЕ ОПЛАТЫ
+   ✅ СТРАНИЦЫ
 ========================= */
 app.get("/success", (req, res) => {
   res.send("Оплата прошла успешно ✅");
@@ -148,7 +168,7 @@ app.get("/cancel", (req, res) => {
 });
 
 /* =========================
-   🔥 ПРОВЕРКА СЕРВЕРА
+   🚀 ПРОВЕРКА
 ========================= */
 app.get("/", (req, res) => {
   res.send("SERVER WORKS 🚀");

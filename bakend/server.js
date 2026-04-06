@@ -8,7 +8,7 @@ const app = express();
 
 app.use(cors());
 
-// 🔥 ВАЖНО: для webhook
+// 🔥 ВАЖНО: webhook должен быть ДО json
 app.use("/webhook", express.raw({ type: "application/json" }));
 app.use(express.json());
 
@@ -38,6 +38,7 @@ app.post("/create-checkout-session", async (req, res) => {
         quantity: item.qty
       })),
 
+      // 🔥 ОБНОВЛЕНО
       success_url: "https://rbc-store.onrender.com/success",
       cancel_url: "https://rbc-store.onrender.com/cancel",
 
@@ -157,14 +158,44 @@ app.get("/orders", (req, res) => {
 });
 
 /* =========================
-   ✅ СТРАНИЦЫ
+   ✅ SUCCESS (с возвратом)
 ========================= */
 app.get("/success", (req, res) => {
-  res.send("Оплата прошла успешно ✅");
+  res.send(`
+    <html>
+      <head>
+        <meta http-equiv="refresh" content="3;url=/" />
+        <style>
+          body {
+            font-family: Arial;
+            text-align: center;
+            padding-top: 100px;
+          }
+        </style>
+      </head>
+      <body>
+        <h2>✅ Оплата прошла успешно</h2>
+        <p>Возвращаем вас в магазин...</p>
+      </body>
+    </html>
+  `);
 });
 
+/* =========================
+   ❌ ОТМЕНА
+========================= */
 app.get("/cancel", (req, res) => {
-  res.send("Оплата отменена ❌");
+  res.send(`
+    <html>
+      <head>
+        <meta http-equiv="refresh" content="3;url=/" />
+      </head>
+      <body style="text-align:center; padding-top:100px;">
+        <h2>❌ Оплата отменена</h2>
+        <p>Вы возвращаетесь в магазин...</p>
+      </body>
+    </html>
+  `);
 });
 
 /* =========================

@@ -39,8 +39,8 @@ app.post("/create-checkout-session", async (req, res) => {
       })),
 
       // 🔥 ОБНОВЛЕНО
-      success_url: "https://rbc-store.onrender.com/success",
-      cancel_url: "https://rbc-store.onrender.com/cancel",
+     success_url: "https://sergo1979sergo21.github.io/?success=true",
+    cancel_url: "https://sergo1979sergo21.github.io/?cancel=true",
 
       metadata: {
         name,

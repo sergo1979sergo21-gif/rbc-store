@@ -9,20 +9,28 @@ let currentProduct = null;
 
 let currentImageIndex = 0;
 
+// ====== SUCCESS / CANCEL ======
 const params = new URLSearchParams(window.location.search);
 
 if (params.get("success")) {
-  alert("Оплата прошла успешно ✅");
 
+  // очищаем корзину
   localStorage.removeItem("cart");
 
-  window.history.replaceState({}, document.title, "/rbc-store/");
+  // показываем страницу успеха
+  document.body.innerHTML = `
+    <div style="text-align:center; padding:40px;">
+      <h2>✅ Спасибо за покупку!</h2>
+      <p>Ваш заказ успешно оплачен</p>
+      <button onclick="window.location.href='/rbc-store/'">
+        Вернуться в магазин
+      </button>
+    </div>
+  `;
 }
 
 if (params.get("cancel")) {
   alert("Оплата отменена ❌");
-
-  window.history.replaceState({}, document.title, "/rbc-store/");
 }
 
 // 👉 ВЫБОР РАЗМЕРА И ЦВЕТА (ОДИН обработчик)
@@ -569,30 +577,6 @@ const nav = document.querySelector("nav");
 burger.addEventListener("click", () => {
   nav.classList.toggle("active");
 });
-
-// ====== SUCCESS / CANCEL ======
-const params = new URLSearchParams(window.location.search);
-
-if (params.get("success")) {
-
-  // очищаем корзину
-  localStorage.removeItem("cart");
-
-  // показываем страницу успеха
-  document.body.innerHTML = `
-    <div style="text-align:center; padding:40px;">
-      <h2>✅ Спасибо за покупку!</h2>
-      <p>Ваш заказ успешно оплачен</p>
-      <button onclick="window.location.href='/rbc-store/'">
-        Вернуться в магазин
-      </button>
-    </div>
-  `;
-}
-
-if (params.get("cancel")) {
-  alert("Оплата отменена ❌");
-}
 
 // 👉 СТАРТ
 updateText();

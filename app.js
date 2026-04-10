@@ -12,25 +12,143 @@ let currentImageIndex = 0;
 // ====== SUCCESS / CANCEL ======
 const params = new URLSearchParams(window.location.search);
 
-if (params.get("success")) {
-
-  // очищаем корзину
+if (urlParams.get("success")) {
   localStorage.removeItem("cart");
 
-  // показываем страницу успеха
   document.body.innerHTML = `
-    <div style="text-align:center; padding:40px;">
-      <h2>✅ Спасибо за покупку!</h2>
-      <p>Ваш заказ успешно оплачен</p>
-      <button onclick="window.location.href='/rbc-store/'">
-        Вернуться в магазин
-      </button>
+    <div style="
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #0A0A0A;
+      color: white;
+      font-family: Montserrat, sans-serif;
+      padding: 20px;
+    ">
+      <div style="
+        width: 100%;
+        max-width: 500px;
+        background: #111;
+        border-radius: 20px;
+        padding: 40px 30px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+        border: 1px solid rgba(255,255,255,0.06);
+      ">
+        <div style="
+          font-size: 54px;
+          margin-bottom: 15px;
+        ">✅</div>
+
+        <h2 style="
+          margin: 0 0 12px;
+          font-size: 28px;
+          font-weight: 800;
+        ">
+          Спасибо за покупку!
+        </h2>
+
+        <p style="
+          margin: 0 0 10px;
+          color: #bbb;
+          font-size: 16px;
+          line-height: 1.5;
+        ">
+          Оплата прошла успешно.
+        </p>
+
+        <p style="
+          margin: 0 0 30px;
+          color: #bbb;
+          font-size: 16px;
+          line-height: 1.5;
+        ">
+          Мы уже получили ваш заказ и скоро свяжемся с вами.
+        </p>
+
+        <button onclick="window.location.href='/rbc-store/'" style="
+          background: linear-gradient(90deg, #ff1e1e, #cc0000);
+          color: white;
+          border: none;
+          border-radius: 14px;
+          padding: 14px 26px;
+          font-size: 16px;
+          font-weight: 700;
+          cursor: pointer;
+          width: 100%;
+        ">
+          Вернуться в магазин
+        </button>
+      </div>
     </div>
   `;
+
+  window.history.replaceState({}, document.title, "/rbc-store/");
 }
 
-if (params.get("cancel")) {
-  alert("Оплата отменена ❌");
+if (urlParams.get("cancel")) {
+  document.body.innerHTML = `
+    <div style="
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #0A0A0A;
+      color: white;
+      font-family: Montserrat, sans-serif;
+      padding: 20px;
+    ">
+      <div style="
+        width: 100%;
+        max-width: 500px;
+        background: #111;
+        border-radius: 20px;
+        padding: 40px 30px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+        border: 1px solid rgba(255,255,255,0.06);
+      ">
+        <div style="
+          font-size: 54px;
+          margin-bottom: 15px;
+        ">❌</div>
+
+        <h2 style="
+          margin: 0 0 12px;
+          font-size: 28px;
+          font-weight: 800;
+        ">
+          Оплата отменена
+        </h2>
+
+        <p style="
+          margin: 0 0 30px;
+          color: #bbb;
+          font-size: 16px;
+          line-height: 1.5;
+        ">
+          Вы можете вернуться в магазин и попробовать снова.
+        </p>
+
+        <button onclick="window.location.href='/rbc-store/'" style="
+          background: linear-gradient(90deg, #ff1e1e, #cc0000);
+          color: white;
+          border: none;
+          border-radius: 14px;
+          padding: 14px 26px;
+          font-size: 16px;
+          font-weight: 700;
+          cursor: pointer;
+          width: 100%;
+        ">
+          Вернуться в магазин
+        </button>
+      </div>
+    </div>
+  `;
+
+  window.history.replaceState({}, document.title, "/rbc-store/");
 }
 
 // 👉 ВЫБОР РАЗМЕРА И ЦВЕТА (ОДИН обработчик)

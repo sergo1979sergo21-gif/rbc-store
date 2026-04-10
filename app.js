@@ -9,7 +9,6 @@ let currentProduct = null;
 
 let currentImageIndex = 0;
 
-// 👉 проверка возврата после оплаты
 const params = new URLSearchParams(window.location.search);
 
 if (params.get("success")) {
@@ -17,14 +16,13 @@ if (params.get("success")) {
 
   localStorage.removeItem("cart");
 
-  // можно обновить страницу без параметров
-  window.history.replaceState({}, document.title, "/");
+  window.history.replaceState({}, document.title, "/rbc-store/");
 }
 
 if (params.get("cancel")) {
   alert("Оплата отменена ❌");
 
-  window.history.replaceState({}, document.title, "/");
+  window.history.replaceState({}, document.title, "/rbc-store/");
 }
 
 // 👉 ВЫБОР РАЗМЕРА И ЦВЕТА (ОДИН обработчик)

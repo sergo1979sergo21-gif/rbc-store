@@ -39,8 +39,8 @@ app.post("/create-checkout-session", async (req, res) => {
       })),
 
       // 🔥 ОБНОВЛЕНО
-     success_url: "https://sergo1979sergo21.github.io/?success=true",
-    cancel_url: "https://sergo1979sergo21.github.io/?cancel=true",
+    success_url: "https://sergo1979sergo21-gif.github.io/rbc-store/?success=true",
+cancel_url: "https://sergo1979sergo21-gif.github.io/rbc-store/?cancel=true",
 
       metadata: {
         name,

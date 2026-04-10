@@ -10,7 +10,7 @@ let currentProduct = null;
 let currentImageIndex = 0;
 
 // ====== SUCCESS / CANCEL ======
-const params = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(window.location.search);
 
 if (urlParams.get("success")) {
   localStorage.removeItem("cart");

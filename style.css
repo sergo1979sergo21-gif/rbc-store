@@ -10,6 +10,10 @@
   --radius-xl: 24px;
   --radius-lg: 18px;
   --radius-md: 12px;
+  --motion-fast: 0.18s;
+  --motion-base: 0.24s;
+  --motion-slow: 0.32s;
+  --motion-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 *,
@@ -96,13 +100,17 @@ button {
   font-weight: 700;
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  transition: border-color 0.22s ease, background-color 0.22s ease;
+  transition:
+    border-color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
 }
 
 .site-header__link:hover,
 .nav-cart:hover {
   border-color: var(--line-soft);
   background: rgba(255, 255, 255, 0.025);
+  transform: translateY(-1px);
 }
 
 .nav-cart {
@@ -158,13 +166,18 @@ button {
   font-weight: 700;
   letter-spacing: 0.1em;
   cursor: pointer;
-  transition: color 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+  transition:
+    color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
 }
 
 .controls button:hover {
   color: var(--text);
   border-color: var(--line-mid);
   background: rgba(255, 255, 255, 0.03);
+  transform: translateY(-1px);
 }
 
 .burger {
@@ -244,13 +257,22 @@ button {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background-color 0.24s ease, border-color 0.24s ease, transform 0.24s ease;
+  transition:
+    background-color var(--motion-base) var(--motion-ease),
+    border-color var(--motion-base) var(--motion-ease),
+    transform var(--motion-base) var(--motion-ease),
+    box-shadow var(--motion-base) var(--motion-ease);
 }
 
 .buy-btn:hover {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.46);
   transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+}
+
+.buy-btn:active {
+  transform: translateY(0);
 }
 
 /* ===== PRODUCTS ===== */
@@ -294,13 +316,16 @@ button {
   border: 1px solid var(--line-soft);
   background: linear-gradient(150deg, var(--surface-1), var(--surface-2));
   overflow: hidden;
-  transition: transform 0.36s ease, border-color 0.36s ease, box-shadow 0.36s ease;
+  transition:
+    transform var(--motion-slow) var(--motion-ease),
+    border-color var(--motion-slow) var(--motion-ease),
+    box-shadow var(--motion-slow) var(--motion-ease);
 }
 
 .product-card:hover {
-  transform: translateY(-7px);
+  transform: translateY(-6px);
   border-color: var(--line-mid);
-  box-shadow: 0 28px 62px rgba(0, 0, 0, 0.34);
+  box-shadow: 0 24px 52px rgba(0, 0, 0, 0.32);
 }
 
 .image-wrapper {
@@ -316,7 +341,9 @@ button {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s ease, opacity 0.6s ease;
+  transition:
+    transform var(--motion-slow) var(--motion-ease),
+    opacity var(--motion-slow) var(--motion-ease);
 }
 
 .hover-img {
@@ -346,7 +373,11 @@ button {
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: color 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+  transition:
+    color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease);
   z-index: 2;
 }
 
@@ -354,6 +385,7 @@ button {
 .like-btn.active {
   color: var(--text);
   border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(10, 10, 10, 0.72);
 }
 
 .like-btn:hover {
@@ -389,12 +421,16 @@ button {
   letter-spacing: 0.13em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background-color 0.24s ease, border-color 0.24s ease;
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
 }
 
 .view-btn:hover {
   background: rgba(255, 255, 255, 0.045);
   border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
 }
 
 /* ===== MODAL ===== */
@@ -402,11 +438,26 @@ button {
   position: fixed;
   inset: 0;
   z-index: 80;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
   background: rgba(0, 0, 0, 0.82);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    opacity var(--motion-fast) var(--motion-ease),
+    visibility 0s linear var(--motion-fast);
+}
+
+.product-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity var(--motion-fast) var(--motion-ease),
+    visibility 0s linear 0s;
 }
 
 .product-modal__content {
@@ -421,6 +472,12 @@ button {
   grid-template-columns: 1fr;
   gap: 20px;
   padding: 20px;
+  transform: translateY(8px) scale(0.992);
+  transition: transform var(--motion-base) var(--motion-ease);
+}
+
+.product-modal.is-open .product-modal__content {
+  transform: translateY(0) scale(1);
 }
 
 .product-modal__close {
@@ -436,6 +493,16 @@ button {
   place-items: center;
   font-size: 1.18rem;
   cursor: pointer;
+  transition:
+    color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease);
+}
+
+.product-modal__close:hover {
+  color: var(--text);
+  border-color: var(--line-mid);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .product-modal__image-wrapper {
@@ -463,6 +530,16 @@ button {
   color: var(--text);
   font-size: 1.5rem;
   cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
+}
+
+.arrow:hover {
+  border-color: var(--line-mid);
+  background: rgba(10, 10, 10, 0.78);
+  transform: translateY(-50%) scale(1.04);
 }
 
 .arrow.left {
@@ -516,12 +593,17 @@ button {
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: var(--text);
   cursor: pointer;
+  transition:
+    border-color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
 }
 
 .sizes button:hover,
 .sizes button.active {
   border-color: rgba(255, 255, 255, 0.58);
   background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
 }
 
 .color {
@@ -531,6 +613,9 @@ button {
   border: 2px solid transparent;
   margin-right: 10px;
   cursor: pointer;
+  transition:
+    transform var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease);
 }
 
 .color.black {
@@ -547,6 +632,7 @@ button {
 
 .color.active {
   border-color: rgba(255, 255, 255, 0.8);
+  transform: scale(1.06);
 }
 
 .main-buy {
@@ -560,10 +646,15 @@ button {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
 }
 
 .main-buy:hover {
   background: rgba(255, 255, 255, 0.11);
+  transform: translateY(-1px);
 }
 
 .main-buy:disabled {
@@ -579,7 +670,7 @@ button {
   background: rgba(0, 0, 0, 0.66);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.24s ease;
+  transition: opacity var(--motion-fast) var(--motion-ease);
 }
 
 .site-overlay.active {
@@ -597,13 +688,16 @@ button {
   border-left: 1px solid var(--line-soft);
   background: linear-gradient(180deg, #121212, #101010);
   transform: translateX(100%);
-  transition: transform 0.3s ease;
+  transition:
+    transform var(--motion-base) var(--motion-ease),
+    box-shadow var(--motion-base) var(--motion-ease);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
 .cart-sidebar.active {
   transform: translateX(0);
+  box-shadow: -18px 0 38px rgba(0, 0, 0, 0.32);
 }
 
 .cart-sidebar__header {
@@ -705,6 +799,16 @@ button {
   color: var(--muted);
   padding: 0 16px;
   cursor: pointer;
+  transition:
+    border-color var(--motion-fast) var(--motion-ease),
+    color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease);
+}
+
+#clear-cart:hover {
+  border-color: var(--line-mid);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 #cart-total {
@@ -745,10 +849,15 @@ button {
   letter-spacing: 0.11em;
   text-transform: uppercase;
   cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
 }
 
 .checkout-btn:hover {
   background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
 }
 
 .checkout-btn:disabled {
@@ -772,6 +881,18 @@ button {
   background: linear-gradient(155deg, var(--surface-1), var(--surface-2));
   padding: 38px 28px;
   text-align: center;
+  animation: status-card-in var(--motion-base) var(--motion-ease) both;
+}
+
+@keyframes status-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .checkout-screen__icon {
@@ -802,6 +923,16 @@ button {
   letter-spacing: 0.11em;
   text-transform: uppercase;
   cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
+}
+
+.checkout-screen__action:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--line-mid);
+  transform: translateY(-1px);
 }
 
 /* ===== TOAST ===== */
@@ -820,13 +951,25 @@ button {
   font-size: 0.82rem;
   opacity: 0;
   transform: translateY(10px);
-  transition: opacity 0.24s ease, transform 0.24s ease;
+  transition:
+    opacity var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
   pointer-events: none;
 }
 
 .toast.show {
   opacity: 1;
   transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ===== SCROLLBAR ===== */

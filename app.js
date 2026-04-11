@@ -262,13 +262,13 @@ function openModal(productId) {
   if (modalTitle) modalTitle.innerText = product.name;
   if (modalPrice) modalPrice.innerText = `${product.price} ₽`;
   if (modalImg) modalImg.src = product.images[0];
-  if (modal) modal.style.display = "flex";
+  if (modal) modal.classList.add("is-open");
   if (modalBuyBtn) modalBuyBtn.disabled = true;
 }
 
 function closeModal() {
   const modal = document.getElementById("modal");
-  if (modal) modal.style.display = "none";
+  if (modal) modal.classList.remove("is-open");
 }
 
 function updateModal() {

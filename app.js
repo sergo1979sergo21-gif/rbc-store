@@ -197,6 +197,41 @@ function startCheckoutButtonLoading(btn) {
   btn.innerText = "Переход к оплате...";
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function requestCheckoutSession(payload) {
+  const response = await fetch("https://rbc-store.onrender.com/create-checkout-session", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  let data = null;
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const error = new Error(data && typeof data.error === "string" ? data.error : "Checkout request failed");
+    error.status = response.status;
+    throw error;
+  }
+
+  if (!data || typeof data.url !== "string" || !data.url) {
+    throw new Error("Invalid checkout response");
+  }
+
+  return data.url;
+}
+
 function scrollToProductsSection() {
   const productsBlock = document.getElementById("products");
   if (!productsBlock) return;
@@ -520,7 +555,7 @@ function closeCart() {
 // =========================
 // ОФОРМЛЕНИЕ ЗАКАЗА (STRIPE)
 // =========================
-function handleCheckout() {
+async function handleCheckout() {
   const btn = document.querySelector(".checkout-btn");
   if (!btn || btn.disabled || isCheckoutRequestInFlight) return;
 
@@ -546,42 +581,33 @@ function handleCheckout() {
     return;
   }
 
-  fetch("https://rbc-store.onrender.com/create-checkout-session", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      cart,
-      name,
-      phone,
-      address
-    })
-  })
-    .then(async (res) => {
-      let data = null;
-      try {
-        data = await res.json();
-      } catch {
-        data = null;
+  const payload = {
+    cart,
+    name,
+    phone,
+    address
+  };
+
+  const maxAttempts = 2;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const checkoutUrl = await requestCheckoutSession(payload);
+      window.location.href = checkoutUrl;
+      return;
+    } catch (error) {
+      const shouldRetry = attempt < maxAttempts && (!("status" in error) || error.status >= 500);
+
+      if (shouldRetry) {
+        await sleep(450);
+        continue;
       }
 
-      if (!res.ok) {
-        throw new Error("Checkout request failed");
-      }
-
-      return data;
-    })
-    .then((data) => {
-      if (!data || typeof data.url !== "string" || !data.url) {
-        throw new Error("Invalid checkout response");
-      }
-      window.location.href = data.url;
-    })
-    .catch(() => {
-      showToast("Ошибка оплаты 😢");
+      showToast("Сервер оплаты временно недоступен");
       resetCheckoutButton(btn);
-    });
+      return;
+    }
+  }
 }
 
 // =========================

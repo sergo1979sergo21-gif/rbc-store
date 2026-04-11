@@ -348,7 +348,9 @@ button {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  background: #0a0a0a;
   transition:
     transform var(--motion-slow) var(--motion-ease),
     opacity var(--motion-slow) var(--motion-ease);
@@ -502,12 +504,17 @@ button {
 
 .catalog-card__media {
   aspect-ratio: 0.83;
+  display: grid;
+  place-items: center;
   background: #0a0a0a;
+  padding: clamp(10px, 1.2vw, 14px);
 }
 
 .catalog-card__img {
   width: 100%;
   height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   object-position: center;
   transition:
@@ -550,7 +557,7 @@ button {
 .catalog-card__content {
   position: relative;
   z-index: 3;
-  margin-top: -92px;
+  margin-top: -76px;
   padding: 0 22px 8px;
   transition: transform var(--motion-base) var(--motion-ease);
 }
@@ -800,6 +807,8 @@ button {
 .product-modal {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 80;
   display: flex;
   align-items: center;
@@ -825,16 +834,16 @@ button {
 
 .product-modal__content {
   position: relative;
-  width: min(1220px, 100%);
-  max-height: calc(100vh - 32px);
-  overflow: auto;
+  width: min(1280px, 92vw);
+  max-height: 92vh;
+  overflow: hidden;
   border-radius: 30px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     radial-gradient(circle at 82% 16%, rgba(255, 255, 255, 0.05) 0%, rgba(12, 12, 12, 0) 38%),
     linear-gradient(145deg, #101010 0%, #0b0b0b 60%, #080808 100%);
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 26px;
   padding: 26px;
   box-shadow:
@@ -846,6 +855,10 @@ button {
 
 .product-modal__media-column {
   min-width: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-self: stretch;
 }
 
 .product-modal.is-open .product-modal__content {
@@ -886,11 +899,14 @@ button {
 .product-modal__gallery {
   display: grid;
   gap: 12px;
+  min-height: 0;
 }
 
 .product-modal__image-wrapper {
   position: relative;
-  min-height: 520px;
+  min-height: 0;
+  height: clamp(300px, 58vh, 700px);
+  max-height: min(66vh, 700px);
   border-radius: 20px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.09);
@@ -904,6 +920,7 @@ button {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: center;
   background: radial-gradient(circle at center, rgba(255, 255, 255, 0.02) 0%, rgba(8, 8, 8, 0) 70%);
   transition: transform var(--motion-slow) var(--motion-ease);
 }
@@ -918,6 +935,7 @@ button {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
+  min-height: 0;
 }
 
 .product-modal__thumb {
@@ -999,6 +1017,18 @@ button {
   gap: 18px;
   align-content: start;
   min-width: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.product-modal__details::-webkit-scrollbar {
+  width: 6px;
+}
+
+.product-modal__details::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
 }
 
 .product-modal__headline {
@@ -1625,7 +1655,8 @@ button {
   }
 
   .product-modal__image-wrapper {
-    min-height: 620px;
+    height: min(62vh, 700px);
+    max-height: min(62vh, 700px);
   }
 }
 
@@ -1731,14 +1762,21 @@ button {
   }
 
   .product-modal {
-    padding: 12px;
+    width: 100vw;
+    height: 100vh;
+    padding: 8px;
   }
 
   .product-modal__content {
-    max-height: calc(100vh - 24px);
+    max-height: 94vh;
     border-radius: 22px;
     padding: 16px;
     gap: 14px;
+    overflow-y: auto;
+  }
+
+  .product-modal__image-wrapper {
+    max-height: min(42vh, 360px);
   }
 
   .product-modal__details {
@@ -1752,10 +1790,6 @@ button {
 
   .product-modal__thumb {
     border-radius: 10px;
-  }
-
-  .product-modal__image-wrapper {
-    min-height: 320px;
   }
 
   .arrow {
@@ -1928,13 +1962,17 @@ button {
   }
 
   .product-modal {
+    width: 100vw;
+    height: 100vh;
     padding: 8px;
   }
 
   .product-modal__content {
+    max-height: 94vh;
     border-radius: 16px;
     padding: 14px;
     gap: 12px;
+    overflow-y: auto;
   }
 
   .product-modal__details {
@@ -2177,8 +2215,10 @@ button {
   }
 
   .product-modal__content {
+    max-height: 94vh;
     border-radius: 14px;
     padding: 12px;
+    overflow-y: auto;
   }
 
   .product-modal__image-wrapper {

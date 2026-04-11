@@ -180,6 +180,20 @@ app.post("/webhook", async (req, res) => {
 
   const session = event.data.object;
   const metadata = session.metadata || {};
+  const stripeSessionId = typeof session.id === "string" ? session.id : null;
+  const stripePaymentIntentId =
+    typeof session.payment_intent === "string"
+      ? session.payment_intent
+      : (session.payment_intent &&
+          typeof session.payment_intent === "object" &&
+          typeof session.payment_intent.id === "string")
+        ? session.payment_intent.id
+        : null;
+
+  if (!stripeSessionId) {
+    console.error("❌ Missing Stripe session.id in webhook event");
+    return res.sendStatus(400);
+  }
 
   let cart = [];
   try {
@@ -191,9 +205,21 @@ app.post("/webhook", async (req, res) => {
   }
 
   const orders = readOrders();
-  const alreadySaved = orders.some((order) => order.stripeSessionId === session.id);
+  const alreadySaved = orders.some((order) => {
+    const sameSessionId = order.stripeSessionId && order.stripeSessionId === stripeSessionId;
+    const samePaymentIntentId =
+      stripePaymentIntentId &&
+      order.stripePaymentIntentId &&
+      order.stripePaymentIntentId === stripePaymentIntentId;
+    return sameSessionId || samePaymentIntentId;
+  });
+
   if (alreadySaved) {
-    console.log(`ℹ️ Duplicate webhook ignored for session ${session.id}`);
+    console.log(
+      `ℹ️ Duplicate webhook ignored for session=${stripeSessionId}, payment_intent=${
+        stripePaymentIntentId || "null"
+      }`
+    );
     return res.sendStatus(200);
   }
 
@@ -202,8 +228,8 @@ app.post("/webhook", async (req, res) => {
     id: timestamp,
     orderId: `RBC-${timestamp}`,
     status: "paid",
-    stripeSessionId: session.id,
-    stripePaymentIntentId: session.payment_intent || null,
+    stripeSessionId,
+    stripePaymentIntentId,
     name: metadata.name || "",
     phone: metadata.phone || "",
     address: metadata.address || "",

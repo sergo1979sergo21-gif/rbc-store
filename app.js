@@ -197,6 +197,21 @@ function startCheckoutButtonLoading(btn) {
   btn.innerText = "Переход к оплате...";
 }
 
+function scrollToProductsSection() {
+  const productsBlock = document.getElementById("products");
+  if (!productsBlock) return;
+
+  const section = productsBlock.closest(".site-products-section") || productsBlock;
+  const header = document.querySelector(".site-header") || document.querySelector(".header");
+  const headerHeight = header ? header.getBoundingClientRect().height : 0;
+  const top = window.scrollY + section.getBoundingClientRect().top - headerHeight - 12;
+
+  window.scrollTo({
+    top: Math.max(0, top),
+    behavior: "smooth"
+  });
+}
+
 // =========================
 // ЯЗЫК И ТОВАРЫ
 // =========================
@@ -693,9 +708,15 @@ if (checkoutBtn) checkoutBtn.addEventListener("click", handleCheckout);
 const buyBtn = document.querySelector(".buy-btn");
 if (buyBtn) {
   buyBtn.addEventListener("click", () => {
-    const productsBlock = document.getElementById("products");
-    if (!productsBlock) return;
-    productsBlock.scrollIntoView({ behavior: "smooth" });
+    scrollToProductsSection();
+  });
+}
+
+const navShopLink = document.querySelector(".nav-shop");
+if (navShopLink) {
+  navShopLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    scrollToProductsSection();
   });
 }
 

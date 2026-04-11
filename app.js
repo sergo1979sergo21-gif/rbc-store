@@ -50,12 +50,11 @@ const products = [
     catalogSubtitle: "OVERSIZED FIT",
     catalogColor: "BLACK",
     price: 2490,
-    image: "https://images.pexels.com/photos/5325589/pexels-photo-5325589.jpeg?auto=compress&cs=tinysrgb&w=800",
-    hoverImg: "https://images.pexels.com/photos/5325589/pexels-photo-5325589.jpeg?auto=compress&cs=tinysrgb&w=800",
-    images: [
-      "https://images.pexels.com/photos/5325589/pexels-photo-5325589.jpeg",
-      "https://images.pexels.com/photos/5325589/pexels-photo-5325589.jpeg"
-    ]
+    images: {
+      front: "image/tshirt-front.png",
+      back: "image/tshirt-back.png",
+      gallery: ["image/tshirt-detail.png", "image/tshirt-side.png"]
+    }
   },
   {
     id: 2,
@@ -64,12 +63,11 @@ const products = [
     catalogSubtitle: "RELAXED FIT",
     catalogColor: "GRAPHITE",
     price: 4990,
-    image: "https://images.pexels.com/photos/6311603/pexels-photo-6311603.jpeg?auto=compress&cs=tinysrgb&w=800",
-    hoverImg: "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg?auto=compress&cs=tinysrgb&w=800",
-    images: [
-      "https://images.pexels.com/photos/6311603/pexels-photo-6311603.jpeg",
-      "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg"
-    ]
+    images: {
+      front: "image/tshirt-front.png",
+      back: "image/tshirt-back.png",
+      gallery: ["image/tshirt-detail.png", "image/tshirt-side.png"]
+    }
   },
   {
     id: 3,
@@ -78,14 +76,34 @@ const products = [
     catalogSubtitle: "ATHLETIC CUT",
     catalogColor: "JET BLACK",
     price: 1990,
-    image: "https://images.pexels.com/photos/936075/pexels-photo-936075.jpeg?auto=compress&cs=tinysrgb&w=800",
-    hoverImg: "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg?auto=compress&cs=tinysrgb&w=800",
-    images: [
-      "https://images.pexels.com/photos/936075/pexels-photo-936075.jpeg",
-      "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg"
-    ]
+    images: {
+      front: "image/tshirt-front.png",
+      back: "image/tshirt-back.png",
+      gallery: ["image/tshirt-detail.png", "image/tshirt-side.png"]
+    }
   }
 ];
+
+function getProductCardImages(product) {
+  const fallbackFront = product && typeof product.image === "string" ? product.image : "";
+  const fallbackBack = product && typeof product.hoverImg === "string" ? product.hoverImg : fallbackFront;
+  const imageConfig = product && typeof product.images === "object" && product.images !== null ? product.images : null;
+  const front = imageConfig && typeof imageConfig.front === "string" ? imageConfig.front : fallbackFront;
+  const back = imageConfig && typeof imageConfig.back === "string" ? imageConfig.back : fallbackBack;
+  return {
+    front,
+    back: back || front
+  };
+}
+
+function getProductGallery(product) {
+  const cardImages = getProductCardImages(product);
+  const gallery = Array.isArray(product && product.images && product.images.gallery)
+    ? product.images.gallery.filter((imagePath) => typeof imagePath === "string" && imagePath)
+    : [];
+
+  return [cardImages.front, cardImages.back, ...gallery].filter((imagePath, index, arr) => imagePath && arr.indexOf(imagePath) === index);
+}
 
 // =========================
 // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
@@ -280,12 +298,13 @@ function renderProducts() {
     const displayColor = product.catalogColor || "BLACK";
     const displayLabel = product.id % 2 === 0 ? "RBC CORE COLLECTION" : "RBC DROP 01";
     const formattedPrice = `${Number(product.price).toLocaleString("ru-RU")} ₽`;
+    const cardImages = getProductCardImages(product);
 
     container.innerHTML += `
       <article class="product-card product-grid__card catalog-card" data-product-id="${product.id}" data-view="front">
         <div class="image-wrapper catalog-card__media" onclick="openModal(${product.id})">
-          <img src="${product.image}" class="main-img catalog-card__img catalog-card__img--front" alt="${displayTitle} FRONT">
-          <img src="${product.hoverImg}" class="hover-img catalog-card__img catalog-card__img--back" alt="${displayTitle} BACK">
+          <img src="${cardImages.front}" class="main-img catalog-card__img catalog-card__img--front" alt="${displayTitle} FRONT">
+          <img src="${cardImages.back}" class="hover-img catalog-card__img catalog-card__img--back" alt="${displayTitle} BACK">
 
           <div class="catalog-card__view-switch" onclick="event.stopPropagation()">
             <button
@@ -353,10 +372,11 @@ function openModal(productId) {
   const modalImg = document.getElementById("modal-img");
   const modal = document.getElementById("modal");
   const modalBuyBtn = document.getElementById("modal-buy");
+  const galleryImages = getProductGallery(product);
 
   if (modalTitle) modalTitle.innerText = product.name;
   if (modalPrice) modalPrice.innerText = `${product.price} ₽`;
-  if (modalImg) modalImg.src = product.images[0];
+  if (modalImg) modalImg.src = galleryImages[0] || "";
   if (modal) modal.classList.add("is-open");
   if (modalBuyBtn) modalBuyBtn.disabled = true;
 }
@@ -369,7 +389,9 @@ function closeModal() {
 function updateModal() {
   const modalImg = document.getElementById("modal-img");
   if (!modalImg || !currentProduct) return;
-  modalImg.src = currentProduct.images[currentImageIndex];
+  const galleryImages = getProductGallery(currentProduct);
+  if (galleryImages.length === 0) return;
+  modalImg.src = galleryImages[currentImageIndex] || galleryImages[0];
 }
 
 function setCatalogCardView(buttonEl, view, event) {
@@ -722,8 +744,10 @@ const prevBtn = document.getElementById("prev");
 if (prevBtn) {
   prevBtn.addEventListener("click", () => {
     if (!currentProduct) return;
+    const galleryImages = getProductGallery(currentProduct);
+    if (galleryImages.length === 0) return;
     currentImageIndex -= 1;
-    if (currentImageIndex < 0) currentImageIndex = currentProduct.images.length - 1;
+    if (currentImageIndex < 0) currentImageIndex = galleryImages.length - 1;
     updateModal();
   });
 }
@@ -732,8 +756,10 @@ const nextBtn = document.getElementById("next");
 if (nextBtn) {
   nextBtn.addEventListener("click", () => {
     if (!currentProduct) return;
+    const galleryImages = getProductGallery(currentProduct);
+    if (galleryImages.length === 0) return;
     currentImageIndex += 1;
-    if (currentImageIndex >= currentProduct.images.length) currentImageIndex = 0;
+    if (currentImageIndex >= galleryImages.length) currentImageIndex = 0;
     updateModal();
   });
 }

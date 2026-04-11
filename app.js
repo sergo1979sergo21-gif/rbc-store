@@ -350,33 +350,15 @@ function renderProducts() {
   products.forEach((product) => {
     const displayTitle = product.catalogTitle || product.name.toUpperCase();
     const displaySubtitle = product.catalogSubtitle || "ATHLETIC FIT";
-    const displayColor = product.catalogColor || "BLACK";
     const displayLabel = product.id % 2 === 0 ? "RBC CORE COLLECTION" : "RBC DROP 01";
     const formattedPrice = `${Number(product.price).toLocaleString("ru-RU")} ₽`;
     const cardImages = getProductCardImages(product);
 
     container.innerHTML += `
-      <article class="product-card product-grid__card catalog-card" data-product-id="${product.id}" data-view="front">
+      <article class="product-card product-grid__card catalog-card" data-product-id="${product.id}">
         <div class="image-wrapper catalog-card__media" onclick="openModal(${product.id})">
           <img src="${cardImages.front}" class="main-img catalog-card__img catalog-card__img--front" alt="${displayTitle} FRONT">
           <img src="${cardImages.back}" class="hover-img catalog-card__img catalog-card__img--back" alt="${displayTitle} BACK">
-
-          <div class="catalog-card__view-switch" onclick="event.stopPropagation()">
-            <button
-              class="catalog-card__view-btn is-active"
-              type="button"
-              onclick="setCatalogCardView(this, 'front', event)"
-            >
-              FRONT
-            </button>
-            <button
-              class="catalog-card__view-btn"
-              type="button"
-              onclick="setCatalogCardView(this, 'back', event)"
-            >
-              BACK
-            </button>
-          </div>
         </div>
 
         <div class="like-btn ${favorites.includes(product.name) ? "active" : ""}" data-favorite-key="${product.name}">❤</div>
@@ -385,16 +367,6 @@ function renderProducts() {
           <p class="catalog-card__eyebrow">${displayLabel}</p>
           <h3 class="catalog-card__title">${displayTitle}</h3>
           <p class="catalog-card__subtitle">${displaySubtitle}</p>
-
-          <div class="catalog-card__meta">
-            <div class="catalog-card__sizes">
-              <button class="catalog-card__size-btn" type="button">S</button>
-              <button class="catalog-card__size-btn" type="button">M</button>
-              <button class="catalog-card__size-btn" type="button">L</button>
-              <button class="catalog-card__size-btn" type="button">XL</button>
-            </div>
-            <p class="catalog-card__color">COLOR: ${displayColor}</p>
-          </div>
 
           <p class="price catalog-card__price">${formattedPrice}</p>
         </div>
@@ -456,23 +428,6 @@ function updateModal() {
   if (galleryImages.length === 0) return;
   modalImg.src = galleryImages[currentImageIndex] || galleryImages[0];
   syncModalActiveThumbnail();
-}
-
-function setCatalogCardView(buttonEl, view, event) {
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
-
-  const card = buttonEl ? buttonEl.closest(".catalog-card") : null;
-  if (!card) return;
-
-  const selectedView = view === "back" ? "back" : "front";
-  card.dataset.view = selectedView;
-
-  card.querySelectorAll(".catalog-card__view-btn").forEach((button) => {
-    button.classList.toggle("is-active", button === buttonEl);
-  });
 }
 
 function checkSelection() {
@@ -709,18 +664,6 @@ function handleDocumentClick(e) {
       currentImageIndex = thumbIndex;
       updateModal();
     }
-    return;
-  }
-
-  const catalogSizeBtn = e.target.closest(".catalog-card__size-btn");
-  if (catalogSizeBtn) {
-    e.preventDefault();
-    e.stopPropagation();
-    const sizeGroup = catalogSizeBtn.closest(".catalog-card__sizes");
-    if (!sizeGroup) return;
-
-    sizeGroup.querySelectorAll(".catalog-card__size-btn").forEach((button) => button.classList.remove("is-active"));
-    catalogSizeBtn.classList.add("is-active");
     return;
   }
 

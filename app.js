@@ -31,13 +31,13 @@ const translations = {
   ru: {
     shop: "Магазин",
     cart: "Корзина",
-    hero: "СОЗДАН ДЛЯ СИЛЬНЫХ",
-    buy: "Купить"
+    hero: "BUILT FOR PERFORMANCE",
+    buy: "КАТАЛОГ"
   },
   en: {
     shop: "Shop",
     cart: "Cart",
-    hero: "BUILT FOR THE STRONG",
+    hero: "BUILT FOR PERFORMANCE",
     buy: "SHOP NOW"
   }
 };

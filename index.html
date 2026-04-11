@@ -10,113 +10,125 @@
 </head>
 <body class="site-body">
 
-<section id="checkout-status-screen" class="checkout-status-screen checkout-screen" hidden>
-  <div class="checkout-status-card checkout-screen__card">
-    <div id="checkout-status-icon" class="checkout-status-icon checkout-screen__icon"></div>
-    <h2 id="checkout-status-title" class="checkout-status-title checkout-screen__title"></h2>
-    <div id="checkout-status-message" class="checkout-status-message checkout-screen__message"></div>
-    <button id="checkout-status-home-btn" class="checkout-status-home-btn checkout-screen__action">Вернуться в магазин</button>
-  </div>
-</section>
-
-<div id="app-content" class="site-app">
-  <header class="header site-header">
-    <div class="site-header__inner">
-      <div class="logo site-header__logo">RBC</div>
-
-      <div class="burger site-header__burger" role="button" aria-label="Открыть меню">☰</div>
-
-      <nav class="nav site-header__nav" aria-label="Основная навигация">
-        <a href="#products" class="nav-shop site-header__link">Магазин</a>
-        <button class="nav-cart site-header__cart-button" type="button">
-          <span class="cart-text">Корзина</span>
-          <span id="cart-count">0</span>
-        </button>
-      </nav>
-
-      <div class="controls site-header__controls">
-        <button type="button" onclick="setLang('ru')">RU</button>
-        <button type="button" onclick="setLang('en')">EN</button>
-      </div>
+  <section id="checkout-status-screen" class="checkout-status-screen checkout-screen" hidden>
+    <div class="checkout-status-card checkout-screen__card">
+      <div id="checkout-status-icon" class="checkout-status-icon checkout-screen__icon"></div>
+      <h2 id="checkout-status-title" class="checkout-status-title checkout-screen__title"></h2>
+      <div id="checkout-status-message" class="checkout-status-message checkout-screen__message"></div>
+      <button id="checkout-status-home-btn" class="checkout-status-home-btn checkout-screen__action">Вернуться в магазин</button>
     </div>
-  </header>
+  </section>
 
-  <main class="site-main">
-    <section class="hero site-hero" aria-label="Главный баннер">
-      <video autoplay muted loop playsinline class="hero-video site-hero__video">
-        <source src="video/gym.mp4" type="video/mp4">
-      </video>
+  <div id="app-content" class="site-app">
+    <header class="header site-header">
+      <div class="site-header__inner">
+        <div class="logo site-header__logo">RBC</div>
 
-      <div class="hero-content site-hero__content">
-        <h2 class="hero-text site-hero__title"></h2>
-        <button class="buy-btn site-hero__action" type="button"></button>
-      </div>
-    </section>
+        <div class="burger site-header__burger" role="button" aria-label="Открыть меню">☰</div>
 
-    <section class="products products-grid site-products" id="products" aria-label="Список товаров"></section>
-  </main>
+        <nav class="nav site-header__nav" aria-label="Основная навигация">
+          <a href="#products" class="nav-shop site-header__link">Магазин</a>
+          <button class="nav-cart site-header__cart-button" type="button">
+            <span class="cart-text">Корзина</span>
+            <span id="cart-count">0</span>
+          </button>
+        </nav>
 
-  <div id="modal" class="modal product-modal" role="dialog" aria-modal="true" aria-label="Карточка товара">
-    <div class="modal-content product-modal__content">
-      <span class="close product-modal__close">&times;</span>
-
-      <div class="modal-image-wrapper product-modal__image-wrapper">
-        <img id="modal-img" class="product-modal__image">
-
-        <button id="prev" class="arrow left product-modal__arrow product-modal__arrow--prev" type="button">‹</button>
-        <button id="next" class="arrow right product-modal__arrow product-modal__arrow--next" type="button">›</button>
-      </div>
-
-      <h2 id="modal-title" class="product-modal__title"></h2>
-      <p id="modal-price" class="product-modal__price"></p>
-
-      <div class="options product-modal__options">
-        <div class="sizes product-modal__sizes">
-          <p>Размер:</p>
-          <button type="button">S</button>
-          <button type="button">M</button>
-          <button type="button">L</button>
-        </div>
-
-        <div class="colors product-modal__colors">
-          <p>Цвет:</p>
-          <button class="color black" type="button"></button>
-          <button class="color red" type="button"></button>
-          <button class="color white" type="button"></button>
+        <div class="controls site-header__controls">
+          <button type="button" onclick="setLang('ru')">RU</button>
+          <button type="button" onclick="setLang('en')">EN</button>
         </div>
       </div>
+    </header>
 
-      <button id="modal-buy" class="main-buy product-modal__buy" type="button" disabled>
-        В КОРЗИНУ
-      </button>
+    <main class="site-main">
+      <section class="hero site-hero" aria-label="Главный баннер">
+        <video autoplay muted loop playsinline class="hero-video site-hero__video">
+          <source src="video/gym.mp4" type="video/mp4">
+        </video>
+        <div class="site-hero__overlay"></div>
+
+        <div class="hero-content site-hero__content">
+          <h2 class="hero-text site-hero__title"></h2>
+          <p class="site-hero__subtitle">RBC SPORTSWEAR</p>
+          <button class="buy-btn site-hero__action" type="button"></button>
+        </div>
+      </section>
+
+      <section class="site-products-section">
+        <div class="site-products-section__head">
+          <p class="site-products-section__label">COLLECTION</p>
+          <h2 class="site-products-section__title">Premium Training Essentials</h2>
+        </div>
+        <section class="products products-grid site-products" id="products" aria-label="Список товаров"></section>
+      </section>
+    </main>
+
+    <div id="modal" class="modal product-modal" role="dialog" aria-modal="true" aria-label="Карточка товара">
+      <div class="modal-content product-modal__content">
+        <span class="close product-modal__close">&times;</span>
+
+        <div class="modal-image-wrapper product-modal__image-wrapper">
+          <img id="modal-img" class="product-modal__image">
+
+          <button id="prev" class="arrow left product-modal__arrow product-modal__arrow--prev" type="button">‹</button>
+          <button id="next" class="arrow right product-modal__arrow product-modal__arrow--next" type="button">›</button>
+        </div>
+
+        <div class="product-modal__details">
+          <h2 id="modal-title" class="product-modal__title"></h2>
+          <p id="modal-price" class="product-modal__price"></p>
+
+          <div class="options product-modal__options">
+            <div class="sizes product-modal__sizes">
+              <p>Размер:</p>
+              <button type="button">S</button>
+              <button type="button">M</button>
+              <button type="button">L</button>
+            </div>
+
+            <div class="colors product-modal__colors">
+              <p>Цвет:</p>
+              <button class="color black" type="button"></button>
+              <button class="color red" type="button"></button>
+              <button class="color white" type="button"></button>
+            </div>
+          </div>
+
+          <button id="modal-buy" class="main-buy product-modal__buy" type="button" disabled>
+            В КОРЗИНУ
+          </button>
+        </div>
+      </div>
     </div>
+
+    <div id="overlay" class="overlay site-overlay"></div>
+
+    <aside id="cart" class="cart cart-sidebar" aria-label="Корзина">
+      <div class="cart-header cart-sidebar__header">
+        <h2 class="cart-sidebar__title">Корзина</h2>
+        <span id="close-cart" class="cart-sidebar__close" role="button" aria-label="Закрыть корзину">✕</span>
+      </div>
+
+      <div id="cart-items" class="cart-sidebar__items"></div>
+
+      <div class="cart-sidebar__checkout">
+        <div class="cart-footer cart-sidebar__footer">
+          <button id="clear-cart" type="button">Очистить</button>
+          <p id="cart-total">Итого: 0 ₽</p>
+        </div>
+
+        <form class="checkout-form cart-sidebar__checkout-form" onsubmit="return false;">
+          <input id="customer-name" class="checkout-form__input" placeholder="Ваше имя" />
+          <input id="customer-phone" class="checkout-form__input" placeholder="Телефон" />
+          <input id="customer-address" class="checkout-form__input" placeholder="Адрес доставки">
+          <button class="checkout-btn checkout-form__submit" type="button">Оформить заказ</button>
+        </form>
+      </div>
+    </aside>
+
+    <div id="toast" class="toast"></div>
   </div>
-
-  <div id="overlay" class="overlay site-overlay"></div>
-
-  <aside id="cart" class="cart cart-sidebar" aria-label="Корзина">
-    <div class="cart-header cart-sidebar__header">
-      <h2 class="cart-sidebar__title">Корзина</h2>
-      <span id="close-cart" class="cart-sidebar__close" role="button" aria-label="Закрыть корзину">✕</span>
-    </div>
-
-    <div id="cart-items" class="cart-sidebar__items"></div>
-
-    <div class="cart-footer cart-sidebar__footer">
-      <button id="clear-cart" type="button">Очистить</button>
-      <p id="cart-total">Итого: 0 ₽</p>
-    </div>
-
-    <form class="checkout-form cart-sidebar__checkout-form" onsubmit="return false;">
-      <input id="customer-name" class="checkout-form__input" placeholder="Ваше имя" />
-      <input id="customer-phone" class="checkout-form__input" placeholder="Телефон" />
-      <input id="customer-address" class="checkout-form__input" placeholder="Адрес доставки">
-      <button class="checkout-btn checkout-form__submit" type="button">Оформить заказ</button>
-    </form>
-  </aside>
-
-  <div id="toast" class="toast"></div>
-</div>
 
 <script src="app.js"></script>
 

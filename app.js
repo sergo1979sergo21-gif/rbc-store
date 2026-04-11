@@ -9,7 +9,7 @@ let selectedSize = null;
 let selectedColor = null;
 let currentProduct = null;
 let currentImageIndex = 0;
-let checkoutResetButtonTextTimer = null;
+let isCheckoutRequestInFlight = false;
 
 const SHOP_HOME_PATH = "/rbc-store/";
 
@@ -166,6 +166,15 @@ function resetCheckoutButton(btn) {
 
   btn.disabled = false;
   btn.innerText = "Оформить заказ";
+  isCheckoutRequestInFlight = false;
+}
+
+function startCheckoutButtonLoading(btn) {
+  if (!btn) return;
+
+  isCheckoutRequestInFlight = true;
+  btn.disabled = true;
+  btn.innerText = "Переход к оплате...";
 }
 
 // =========================
@@ -400,12 +409,11 @@ function closeCart() {
 // =========================
 function handleCheckout() {
   const btn = document.querySelector(".checkout-btn");
-  if (!btn || btn.disabled) return;
+  if (!btn || btn.disabled || isCheckoutRequestInFlight) return;
 
-  btn.disabled = true;
-  btn.innerText = "Переход к оплате...";
+  startCheckoutButtonLoading(btn);
 
-  if (cart.length === 0) {
+  if (!Array.isArray(cart) || cart.length === 0) {
     showToast("Корзина пуста");
     resetCheckoutButton(btn);
     return;
@@ -415,9 +423,9 @@ function handleCheckout() {
   const phoneInput = document.getElementById("customer-phone");
   const addressInput = document.getElementById("customer-address");
 
-  const name = nameInput ? nameInput.value : "";
-  const phone = phoneInput ? phoneInput.value : "";
-  const address = addressInput ? addressInput.value : "";
+  const name = nameInput ? nameInput.value.trim() : "";
+  const phone = phoneInput ? phoneInput.value.trim() : "";
+  const address = addressInput ? addressInput.value.trim() : "";
 
   if (!name || !phone || !address) {
     showToast("Заполните все поля");
@@ -437,9 +445,22 @@ function handleCheckout() {
       address
     })
   })
-    .then((res) => res.json())
+    .then(async (res) => {
+      let data = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+
+      if (!res.ok) {
+        throw new Error("Checkout request failed");
+      }
+
+      return data;
+    })
     .then((data) => {
-      if (!data || !data.url) {
+      if (!data || typeof data.url !== "string" || !data.url) {
         throw new Error("Invalid checkout response");
       }
       window.location.href = data.url;

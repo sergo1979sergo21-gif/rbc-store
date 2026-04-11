@@ -2,41 +2,326 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Админка</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBC Admin — Заказы</title>
+  <style>
+    :root {
+      --bg: #0c0d11;
+      --panel: #151823;
+      --panel-border: #2a2f42;
+      --text: #f4f5f8;
+      --muted: #9fa7c3;
+      --accent: #ff2d2d;
+      --badge: #2f4e2a;
+      --badge-text: #a9f7a0;
+      --danger: #ff6b6b;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Montserrat, Arial, sans-serif;
+    }
+
+    .admin-page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 16px 40px;
+    }
+
+    .admin-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .admin-title {
+      margin: 0;
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .admin-meta {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .orders-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .order-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .order-card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .order-number {
+      margin: 0 0 6px;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .order-date {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .order-status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 88px;
+      height: 30px;
+      border-radius: 999px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: rgba(128, 128, 128, 0.2);
+      color: #d9d9d9;
+    }
+
+    .order-status--paid {
+      background: var(--badge);
+      color: var(--badge-text);
+    }
+
+    .order-status--unknown {
+      background: rgba(255, 255, 255, 0.08);
+      color: #cfd5ea;
+    }
+
+    .order-grid {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .order-line {
+      margin: 0;
+      color: #e4e6ef;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .order-line strong {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .items-block {
+      border-top: 1px solid var(--panel-border);
+      margin-top: 12px;
+      padding-top: 12px;
+    }
+
+    .items-title {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .items-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .item-row {
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .item-name {
+      margin: 0 0 4px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .item-meta {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .item-price {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: #f7f7f9;
+    }
+
+    .state-box {
+      border: 1px dashed var(--panel-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      color: var(--muted);
+      text-align: center;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .state-box--error {
+      border-color: rgba(255, 107, 107, 0.5);
+      color: var(--danger);
+    }
+  </style>
 </head>
 <body>
+  <main class="admin-page">
+    <header class="admin-header">
+      <div>
+        <h1 class="admin-title">📦 Заказы</h1>
+        <p id="orders-meta" class="admin-meta">Загрузка...</p>
+      </div>
+    </header>
 
-<h1>📦 Заказы</h1>
-<div id="orders"></div>
+    <section id="orders-list" class="orders-grid" aria-live="polite"></section>
+  </main>
 
-<script>
-fetch("https://rbc-store.onrender.com/orders")
-  .then(res => res.json())
-  .then(data => {
+  <script>
+    const ORDERS_API_URL = "https://rbc-store.onrender.com/orders";
+    const ordersListEl = document.getElementById("orders-list");
+    const ordersMetaEl = document.getElementById("orders-meta");
 
-    const container = document.getElementById("orders");
+    function getSortTimestamp(order) {
+      if (Number.isFinite(Number(order?.id))) {
+        return Number(order.id);
+      }
 
-    data.reverse().forEach(order => {
-      const div = document.createElement("div");
+      if (typeof order?.orderId === "string") {
+        const matched = order.orderId.match(/RBC-(\d+)/);
+        if (matched && Number.isFinite(Number(matched[1]))) {
+          return Number(matched[1]);
+        }
+      }
 
-      div.style.border = "1px solid #ccc";
-      div.style.margin = "10px";
-      div.style.padding = "10px";
+      const parsedDate = Date.parse(order?.date || "");
+      if (Number.isFinite(parsedDate)) {
+        return parsedDate;
+      }
 
-      div.innerHTML = `
-        <h3>Заказ #${order.id}</h3>
-        <p>👤 ${order.name}</p>
-        <p>📞 ${order.phone}</p>
-        <p>📍 ${order.address}</p>
-        <p>💰 ${order.total} ₽</p>
-        <p>📅 ${order.date}</p>
+      return 0;
+    }
+
+    function formatOrderNumber(order) {
+      return order.orderId || `#${order.id ?? "—"}`;
+    }
+
+    function formatStatus(order) {
+      const status = (order.status || "unknown").toLowerCase();
+      return status;
+    }
+
+    function formatMoney(value) {
+      const amount = Number(value) || 0;
+      return `${amount.toLocaleString("ru-RU")} ₽`;
+    }
+
+    function renderStateBox(text, isError) {
+      const className = isError ? "state-box state-box--error" : "state-box";
+      ordersListEl.innerHTML = `<div class="${className}">${text}</div>`;
+    }
+
+    function renderOrderItem(item) {
+      const itemTotal = (Number(item.price) || 0) * (Number(item.qty) || 0);
+      return `
+        <li class="item-row">
+          <p class="item-name">${item.name || "Без названия"}</p>
+          <p class="item-meta">Размер: ${item.size || "—"} · Цвет: ${item.color || "—"} · Кол-во: ${item.qty || 0}</p>
+          <p class="item-price">${formatMoney(itemTotal)}</p>
+        </li>
       `;
+    }
 
-      container.appendChild(div);
-    });
+    function renderOrderCard(order) {
+      const status = formatStatus(order);
+      const statusClass = status === "paid" ? "order-status order-status--paid" : "order-status order-status--unknown";
+      const items = Array.isArray(order.cart) ? order.cart : [];
 
-  });
-</script>
+      return `
+        <article class="order-card">
+          <div class="order-card-header">
+            <div>
+              <h2 class="order-number">${formatOrderNumber(order)}</h2>
+              <p class="order-date">${order.date || "Дата неизвестна"}</p>
+            </div>
+            <span class="${statusClass}">${status}</span>
+          </div>
 
+          <div class="order-grid">
+            <p class="order-line"><strong>Имя:</strong> ${order.name || "—"}</p>
+            <p class="order-line"><strong>Телефон:</strong> ${order.phone || "—"}</p>
+            <p class="order-line"><strong>Адрес:</strong> ${order.address || "—"}</p>
+            <p class="order-line"><strong>Сумма:</strong> ${formatMoney(order.total)}</p>
+          </div>
+
+          <div class="items-block">
+            <h3 class="items-title">Товары</h3>
+            <ul class="items-list">
+              ${items.length > 0 ? items.map(renderOrderItem).join("") : `<li class="item-row"><p class="item-name">Нет данных по товарам</p></li>`}
+            </ul>
+          </div>
+        </article>
+      `;
+    }
+
+    async function loadOrders() {
+      renderStateBox("Загрузка заказов...", false);
+
+      try {
+        const response = await fetch(ORDERS_API_URL);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const orders = await response.json();
+        if (!Array.isArray(orders)) {
+          throw new Error("Invalid orders payload");
+        }
+
+        const sortedOrders = [...orders].sort((a, b) => getSortTimestamp(b) - getSortTimestamp(a));
+        ordersMetaEl.textContent = `Всего заказов: ${sortedOrders.length}`;
+
+        if (sortedOrders.length === 0) {
+          renderStateBox("Заказов пока нет", false);
+          return;
+        }
+
+        ordersListEl.innerHTML = sortedOrders.map(renderOrderCard).join("");
+      } catch (error) {
+        console.error("Orders load error:", error);
+        ordersMetaEl.textContent = "Ошибка загрузки";
+        renderStateBox("Не удалось загрузить заказы. Проверьте доступность сервера.", true);
+      }
+    }
+
+    loadOrders();
+  </script>
 </body>
 </html>

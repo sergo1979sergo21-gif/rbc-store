@@ -2,8 +2,8 @@
 // ГЛОБАЛЬНОЕ СОСТОЯНИЕ
 // =========================
 let lang = "ru";
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+let cart = readArrayFromLocalStorage("cart");
+let favorites = readArrayFromLocalStorage("favorites");
 
 let selectedSize = null;
 let selectedColor = null;
@@ -12,6 +12,17 @@ let currentImageIndex = 0;
 let isCheckoutRequestInFlight = false;
 
 const SHOP_HOME_PATH = "/rbc-store/";
+
+function readArrayFromLocalStorage(key) {
+  try {
+    const value = localStorage.getItem(key);
+    if (!value) return [];
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 // =========================
 // ПЕРЕВОДЫ И ТОВАРЫ
@@ -340,23 +351,49 @@ function renderCart() {
 
     const div = document.createElement("div");
     div.classList.add("cart-item");
+    const itemInfo = document.createElement("div");
+    const nameEl = document.createElement("p");
+    const detailsEl = document.createElement("small");
+    nameEl.textContent = item.name || "Без названия";
+    detailsEl.textContent = `${item.size || "—"} / ${item.color || "—"}`;
+    itemInfo.appendChild(nameEl);
+    itemInfo.appendChild(detailsEl);
 
-    div.innerHTML = `
-      <div>
-        <p>${item.name}</p>
-        <small>${item.size} / ${item.color}</small>
-      </div>
+    const itemControls = document.createElement("div");
+    const summaryEl = document.createElement("p");
+    summaryEl.textContent = `${item.price} ₽ × ${item.qty}`;
 
-      <div>
-        <p>${item.price} ₽ × ${item.qty}</p>
-        <div class="qty-controls">
-          <button onclick="changeQty(${index}, -1)">-</button>
-          <span>${item.qty}</span>
-          <button onclick="changeQty(${index}, 1)">+</button>
-        </div>
-        <button onclick="removeFromCart(${index})">✕</button>
-      </div>
-    `;
+    const qtyControls = document.createElement("div");
+    qtyControls.className = "qty-controls";
+
+    const decreaseBtn = document.createElement("button");
+    decreaseBtn.type = "button";
+    decreaseBtn.textContent = "-";
+    decreaseBtn.addEventListener("click", () => changeQty(index, -1));
+
+    const qtyValue = document.createElement("span");
+    qtyValue.textContent = item.qty;
+
+    const increaseBtn = document.createElement("button");
+    increaseBtn.type = "button";
+    increaseBtn.textContent = "+";
+    increaseBtn.addEventListener("click", () => changeQty(index, 1));
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "✕";
+    removeBtn.addEventListener("click", () => removeFromCart(index));
+
+    qtyControls.appendChild(decreaseBtn);
+    qtyControls.appendChild(qtyValue);
+    qtyControls.appendChild(increaseBtn);
+
+    itemControls.appendChild(summaryEl);
+    itemControls.appendChild(qtyControls);
+    itemControls.appendChild(removeBtn);
+
+    div.appendChild(itemInfo);
+    div.appendChild(itemControls);
 
     container.appendChild(div);
   });

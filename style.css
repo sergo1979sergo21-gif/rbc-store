@@ -315,6 +315,10 @@ button {
   gap: 22px;
 }
 
+#products {
+  scroll-margin-top: 110px;
+}
+
 .product-card {
   border-radius: var(--radius-xxl);
   border: 1px solid var(--line-soft);

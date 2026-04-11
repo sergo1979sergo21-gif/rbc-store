@@ -111,6 +111,55 @@ function getProductGallery(product) {
   return [cardImages.front, cardImages.back, ...gallery].filter((imagePath, index, arr) => imagePath && arr.indexOf(imagePath) === index);
 }
 
+function getProductModalMeta(product) {
+  const subtitle = product && typeof product.catalogSubtitle === "string" && product.catalogSubtitle
+    ? product.catalogSubtitle
+    : "OVERSIZED FIT";
+  const material = "HEAVYWEIGHT COTTON";
+  const label = product && product.id % 2 === 0 ? "RBC CORE COLLECTION" : "RBC DROP 01";
+
+  return {
+    label,
+    subtitle,
+    material
+  };
+}
+
+function renderModalThumbnails(product) {
+  const thumbnailsContainer = document.getElementById("modal-thumbnails");
+  if (!thumbnailsContainer) return;
+
+  const galleryImages = getProductGallery(product);
+  thumbnailsContainer.replaceChildren();
+
+  galleryImages.forEach((imagePath, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "product-modal__thumb";
+    button.dataset.index = String(index);
+    button.setAttribute("aria-label", `Показать изображение ${index + 1}`);
+    button.classList.toggle("is-active", index === currentImageIndex);
+
+    const thumbnailImage = document.createElement("img");
+    thumbnailImage.src = imagePath;
+    thumbnailImage.alt = `Preview ${index + 1}`;
+    thumbnailImage.loading = "lazy";
+    button.appendChild(thumbnailImage);
+
+    thumbnailsContainer.appendChild(button);
+  });
+}
+
+function syncModalActiveThumbnail() {
+  const thumbnailsContainer = document.getElementById("modal-thumbnails");
+  if (!thumbnailsContainer) return;
+
+  thumbnailsContainer.querySelectorAll(".product-modal__thumb").forEach((thumbButton) => {
+    const thumbIndex = Number(thumbButton.dataset.index);
+    thumbButton.classList.toggle("is-active", thumbIndex === currentImageIndex);
+  });
+}
+
 // =========================
 // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
 // =========================
@@ -378,11 +427,19 @@ function openModal(productId) {
   const modalImg = document.getElementById("modal-img");
   const modal = document.getElementById("modal");
   const modalBuyBtn = document.getElementById("modal-buy");
+  const modalLabel = document.getElementById("modal-label");
+  const modalSubtitle = document.getElementById("modal-subtitle");
+  const modalMaterial = document.getElementById("modal-material");
   const galleryImages = getProductGallery(product);
+  const modalMeta = getProductModalMeta(product);
 
   if (modalTitle) modalTitle.innerText = product.name;
   if (modalPrice) modalPrice.innerText = `${product.price} ₽`;
   if (modalImg) modalImg.src = galleryImages[0] || "";
+  if (modalLabel) modalLabel.innerText = modalMeta.label;
+  if (modalSubtitle) modalSubtitle.innerText = modalMeta.subtitle;
+  if (modalMaterial) modalMaterial.innerText = modalMeta.material;
+  renderModalThumbnails(product);
   if (modal) modal.classList.add("is-open");
   if (modalBuyBtn) modalBuyBtn.disabled = true;
 }
@@ -398,6 +455,7 @@ function updateModal() {
   const galleryImages = getProductGallery(currentProduct);
   if (galleryImages.length === 0) return;
   modalImg.src = galleryImages[currentImageIndex] || galleryImages[0];
+  syncModalActiveThumbnail();
 }
 
 function setCatalogCardView(buttonEl, view, event) {
@@ -643,6 +701,17 @@ async function handleCheckout() {
 // ОБРАБОТЧИКИ СОБЫТИЙ UI
 // =========================
 function handleDocumentClick(e) {
+  const modalThumbBtn = e.target.closest(".product-modal__thumb");
+  if (modalThumbBtn && currentProduct) {
+    e.preventDefault();
+    const thumbIndex = Number(modalThumbBtn.dataset.index);
+    if (!Number.isNaN(thumbIndex)) {
+      currentImageIndex = thumbIndex;
+      updateModal();
+    }
+    return;
+  }
+
   const catalogSizeBtn = e.target.closest(".catalog-card__size-btn");
   if (catalogSizeBtn) {
     e.preventDefault();

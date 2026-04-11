@@ -75,27 +75,37 @@
       <div class="modal-content product-modal__content">
         <span class="close product-modal__close">&times;</span>
 
-        <div class="modal-image-wrapper product-modal__image-wrapper">
-          <img id="modal-img" class="product-modal__image" alt="Изображение товара">
+        <div class="product-modal__media-column">
+          <div class="modal-image-wrapper product-modal__image-wrapper">
+            <img id="modal-img" class="product-modal__image" alt="Изображение товара">
 
-          <button id="prev" class="arrow left product-modal__arrow product-modal__arrow--prev" type="button">‹</button>
-          <button id="next" class="arrow right product-modal__arrow product-modal__arrow--next" type="button">›</button>
+            <button id="prev" class="arrow left product-modal__arrow product-modal__arrow--prev" type="button">‹</button>
+            <button id="next" class="arrow right product-modal__arrow product-modal__arrow--next" type="button">›</button>
+          </div>
+          <div id="modal-thumbs" class="product-modal__thumbs" aria-label="Предпросмотр изображений"></div>
         </div>
 
         <div class="product-modal__details">
+          <p id="modal-label" class="product-modal__label">RBC DROP 01</p>
           <h2 id="modal-title" class="product-modal__title"></h2>
+
+          <div class="product-modal__meta">
+            <p id="modal-fit" class="product-modal__meta-item">OVERSIZED FIT</p>
+            <p id="modal-material" class="product-modal__meta-item">HEAVYWEIGHT COTTON</p>
+          </div>
+
           <p id="modal-price" class="product-modal__price"></p>
 
           <div class="options product-modal__options">
             <div class="sizes product-modal__sizes">
-              <p>Размер:</p>
+              <p>Размер</p>
               <button type="button">S</button>
               <button type="button">M</button>
               <button type="button">L</button>
             </div>
 
             <div class="colors product-modal__colors">
-              <p>Цвет:</p>
+              <p>Цвет</p>
               <button class="color black" type="button"></button>
               <button class="color red" type="button"></button>
               <button class="color white" type="button"></button>
@@ -103,8 +113,14 @@
           </div>
 
           <button id="modal-buy" class="main-buy product-modal__buy" type="button" disabled>
-            В КОРЗИНУ
+            BUY NOW
           </button>
+
+          <ul class="product-modal__info-list">
+            <li>Limited drop</li>
+            <li>Premium print</li>
+            <li>Delivery available</li>
+          </ul>
         </div>
       </div>
     </div>

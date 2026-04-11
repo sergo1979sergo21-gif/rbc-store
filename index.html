@@ -75,14 +75,15 @@
       <div class="modal-content product-modal__content">
         <span class="close product-modal__close">&times;</span>
 
-        <div class="product-modal__media-column">
+        <div class="product-modal__media-column product-modal__gallery">
           <div class="modal-image-wrapper product-modal__image-wrapper">
             <img id="modal-img" class="product-modal__image" alt="Изображение товара">
+            <span id="modal-shot-label" class="product-modal__shot-label">FRONT</span>
 
             <button id="prev" class="arrow left product-modal__arrow product-modal__arrow--prev" type="button">‹</button>
             <button id="next" class="arrow right product-modal__arrow product-modal__arrow--next" type="button">›</button>
           </div>
-          <div id="modal-thumbs" class="product-modal__thumbs" aria-label="Предпросмотр изображений"></div>
+          <div id="modal-thumbnails" class="product-modal__thumbs" aria-label="Предпросмотр изображений"></div>
         </div>
 
         <div class="product-modal__details">
@@ -90,8 +91,8 @@
           <h2 id="modal-title" class="product-modal__title"></h2>
 
           <div class="product-modal__meta">
-            <p id="modal-fit" class="product-modal__meta-item">OVERSIZED FIT</p>
-            <p id="modal-material" class="product-modal__meta-item">HEAVYWEIGHT COTTON</p>
+            <p id="modal-subtitle" class="product-modal__meta-line">OVERSIZED FIT</p>
+            <p id="modal-material" class="product-modal__meta-line">HEAVYWEIGHT COTTON</p>
           </div>
 
           <p id="modal-price" class="product-modal__price"></p>
@@ -116,7 +117,7 @@
             BUY NOW
           </button>
 
-          <ul class="product-modal__info-list">
+          <ul class="product-modal__info">
             <li>Limited drop</li>
             <li>Premium print</li>
             <li>Delivery available</li>

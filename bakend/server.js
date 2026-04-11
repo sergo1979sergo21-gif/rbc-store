@@ -5,6 +5,7 @@ import cors from "cors";
 import Stripe from "stripe";
 
 const app = express();
+const FRONTEND_BASE_URL = "https://sergo1979sergo21-gif.github.io/rbc-store/";
 
 app.use(cors());
 
@@ -38,9 +39,8 @@ app.post("/create-checkout-session", async (req, res) => {
         quantity: item.qty
       })),
 
-      // 🔥 ОБНОВЛЕНО
-    success_url: "https://sergo1979sergo21-gif.github.io/rbc-store/?success=true",
-cancel_url: "https://sergo1979sergo21-gif.github.io/rbc-store/?cancel=true",
+      success_url: `${FRONTEND_BASE_URL}?success=true`,
+      cancel_url: `${FRONTEND_BASE_URL}?cancel=true`,
 
       metadata: {
         name,

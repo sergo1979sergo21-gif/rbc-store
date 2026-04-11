@@ -9,6 +9,7 @@ let selectedSize = null;
 let selectedColor = null;
 let currentProduct = null;
 let currentImageIndex = 0;
+let checkoutResetButtonTextTimer = null;
 
 const SHOP_HOME_PATH = "/rbc-store/";
 
@@ -90,6 +91,11 @@ function showToast(text) {
   }, 2000);
 }
 
+function cleanCheckoutQueryParams() {
+  const cleanUrl = `${window.location.origin}${window.location.pathname}${window.location.hash}`;
+  window.history.replaceState({}, document.title, cleanUrl);
+}
+
 // =========================
 // SUCCESS / CANCEL (ОДНО МЕСТО)
 // =========================
@@ -118,77 +124,34 @@ function renderCheckoutStatusPage(status) {
     localStorage.removeItem("cart");
     cart = [];
   }
+  const checkoutScreen = document.getElementById("checkout-status-screen");
+  const appContent = document.getElementById("app-content");
+  const iconEl = document.getElementById("checkout-status-icon");
+  const titleEl = document.getElementById("checkout-status-title");
+  const messageEl = document.getElementById("checkout-status-message");
+  const homeBtn = document.getElementById("checkout-status-home-btn");
 
-  const descriptionHtml = config.paragraphs
-    .map((text, index) => {
-      const marginBottom = index === config.paragraphs.length - 1 ? 30 : 10;
-      return `
-        <p style="
-          margin: 0 0 ${marginBottom}px;
-          color: #bbb;
-          font-size: 16px;
-          line-height: 1.5;
-        ">
-          ${text}
-        </p>
-      `;
-    })
-    .join("");
+  if (!checkoutScreen || !appContent || !iconEl || !titleEl || !messageEl || !homeBtn) {
+    return false;
+  }
 
-  document.body.innerHTML = `
-    <div style="
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #0A0A0A;
-      color: white;
-      font-family: Montserrat, sans-serif;
-      padding: 20px;
-    ">
-      <div style="
-        width: 100%;
-        max-width: 500px;
-        background: #111;
-        border-radius: 20px;
-        padding: 40px 30px;
-        text-align: center;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-        border: 1px solid rgba(255,255,255,0.06);
-      ">
-        <div style="
-          font-size: 54px;
-          margin-bottom: 15px;
-        ">${config.icon}</div>
+  iconEl.innerText = config.icon;
+  titleEl.innerText = config.title;
+  messageEl.replaceChildren();
 
-        <h2 style="
-          margin: 0 0 12px;
-          font-size: 28px;
-          font-weight: 800;
-        ">
-          ${config.title}
-        </h2>
+  config.paragraphs.forEach((text) => {
+    const paragraph = document.createElement("p");
+    paragraph.innerText = text;
+    messageEl.appendChild(paragraph);
+  });
 
-        ${descriptionHtml}
+  homeBtn.onclick = () => {
+    window.location.href = SHOP_HOME_PATH;
+  };
 
-        <button onclick="window.location.href='${SHOP_HOME_PATH}'" style="
-          background: linear-gradient(90deg, #ff1e1e, #cc0000);
-          color: white;
-          border: none;
-          border-radius: 14px;
-          padding: 14px 26px;
-          font-size: 16px;
-          font-weight: 700;
-          cursor: pointer;
-          width: 100%;
-        ">
-          Вернуться в магазин
-        </button>
-      </div>
-    </div>
-  `;
-
-  window.history.replaceState({}, document.title, SHOP_HOME_PATH);
+  appContent.hidden = true;
+  checkoutScreen.hidden = false;
+  cleanCheckoutQueryParams();
   return true;
 }
 
@@ -196,6 +159,13 @@ function handleCheckoutStatusFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
   const status = urlParams.get("success") ? "success" : urlParams.get("cancel") ? "cancel" : null;
   return renderCheckoutStatusPage(status);
+}
+
+function resetCheckoutButton(btn) {
+  if (!btn) return;
+
+  btn.disabled = false;
+  btn.innerText = "Оформить заказ";
 }
 
 // =========================
@@ -436,9 +406,8 @@ function handleCheckout() {
   btn.innerText = "Переход к оплате...";
 
   if (cart.length === 0) {
-    alert("Корзина пуста");
-    btn.disabled = false;
-    btn.innerText = "Оформить заказ";
+    showToast("Корзина пуста");
+    resetCheckoutButton(btn);
     return;
   }
 
@@ -451,9 +420,8 @@ function handleCheckout() {
   const address = addressInput ? addressInput.value : "";
 
   if (!name || !phone || !address) {
-    alert("Заполните все поля");
-    btn.disabled = false;
-    btn.innerText = "Оформить заказ";
+    showToast("Заполните все поля");
+    resetCheckoutButton(btn);
     return;
   }
 
@@ -471,12 +439,14 @@ function handleCheckout() {
   })
     .then((res) => res.json())
     .then((data) => {
+      if (!data || !data.url) {
+        throw new Error("Invalid checkout response");
+      }
       window.location.href = data.url;
     })
     .catch(() => {
-      alert("Ошибка оплаты 😢");
-      btn.disabled = false;
-      btn.innerText = "Оформить заказ";
+      showToast("Ошибка оплаты 😢");
+      resetCheckoutButton(btn);
     });
 }
 
@@ -530,7 +500,7 @@ if (modalBuyBtn) {
     if (!currentProduct) return;
 
     if (!selectedSize || !selectedColor) {
-      alert("Выбери размер и цвет");
+      showToast("Выбери размер и цвет");
       return;
     }
 

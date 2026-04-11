@@ -10,6 +10,17 @@
 </head>
 <body>
 
+<section id="checkout-status-screen" class="checkout-status-screen" hidden>
+  <div class="checkout-status-card">
+    <div id="checkout-status-icon" class="checkout-status-icon"></div>
+    <h2 id="checkout-status-title" class="checkout-status-title"></h2>
+    <div id="checkout-status-message" class="checkout-status-message"></div>
+    <button id="checkout-status-home-btn" class="checkout-status-home-btn">Вернуться в магазин</button>
+  </div>
+</section>
+
+<div id="app-content">
+
 <header class="header">
   <div class="logo">RBC</div>
 
@@ -107,15 +118,8 @@
   <button class="checkout-btn">Оформить заказ</button>
 
 </div>
-
-<div id="success-modal" class="success-modal">
-  <div class="success-content">
-    <h2>✅ Заказ отправлен</h2>
-    <p>Мы скоро свяжемся с вами</p>
-    <button onclick="closeSuccess()">ОК</button>
-  </div>
-</div>
 <div id="toast" class="toast"></div>
+</div>
 
 <script src="app.js"></script>
 

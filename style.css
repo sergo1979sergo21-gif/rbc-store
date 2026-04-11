@@ -894,39 +894,60 @@ body.no-scroll {
   transform: translateY(0);
 }
 
-.success-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-
-  background: rgba(0,0,0,0.7);
-
-  display: none;
-  align-items: center;
+.checkout-status-screen {
+  min-height: 100vh;
+  display: flex;
   justify-content: center;
-
-  z-index: 999999;
+  align-items: center;
+  background: #0a0a0a;
+  color: #fff;
+  font-family: Montserrat, sans-serif;
+  padding: 20px;
 }
 
-.success-content {
+.checkout-status-card {
+  width: 100%;
+  max-width: 500px;
   background: #111;
-  padding: 30px;
-  border-radius: 12px;
+  border-radius: 20px;
+  padding: 40px 30px;
   text-align: center;
-  color: #fff;
-
-  width: 300px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.success-content button {
-  margin-top: 20px;
-  padding: 10px 20px;
+.checkout-status-icon {
+  font-size: 54px;
+  margin-bottom: 15px;
+}
+
+.checkout-status-title {
+  margin: 0 0 12px;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.checkout-status-message p {
+  margin: 0 0 10px;
+  color: #bbb;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.checkout-status-message p:last-child {
+  margin-bottom: 30px;
+}
+
+.checkout-status-home-btn {
+  background: linear-gradient(90deg, #ff1e1e, #cc0000);
+  color: white;
   border: none;
-  background: #ff1e1e;
-  color: #fff;
+  border-radius: 14px;
+  padding: 14px 26px;
+  font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
+  width: 100%;
 }
 
 /* стили к +- в корзине */

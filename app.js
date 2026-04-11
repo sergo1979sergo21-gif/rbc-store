@@ -1,188 +1,20 @@
-
+// =========================
+// ГЛОБАЛЬНОЕ СОСТОЯНИЕ
+// =========================
 let lang = "ru";
-
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
 let selectedSize = null;
 let selectedColor = null;
 let currentProduct = null;
-
 let currentImageIndex = 0;
 
-// ====== SUCCESS / CANCEL ======
-const urlParams = new URLSearchParams(window.location.search);
+const SHOP_HOME_PATH = "/rbc-store/";
 
-if (urlParams.get("success")) {
-  localStorage.removeItem("cart");
-
-  document.body.innerHTML = `
-    <div style="
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #0A0A0A;
-      color: white;
-      font-family: Montserrat, sans-serif;
-      padding: 20px;
-    ">
-      <div style="
-        width: 100%;
-        max-width: 500px;
-        background: #111;
-        border-radius: 20px;
-        padding: 40px 30px;
-        text-align: center;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-        border: 1px solid rgba(255,255,255,0.06);
-      ">
-        <div style="
-          font-size: 54px;
-          margin-bottom: 15px;
-        ">✅</div>
-
-        <h2 style="
-          margin: 0 0 12px;
-          font-size: 28px;
-          font-weight: 800;
-        ">
-          Спасибо за покупку!
-        </h2>
-
-        <p style="
-          margin: 0 0 10px;
-          color: #bbb;
-          font-size: 16px;
-          line-height: 1.5;
-        ">
-          Оплата прошла успешно.
-        </p>
-
-        <p style="
-          margin: 0 0 30px;
-          color: #bbb;
-          font-size: 16px;
-          line-height: 1.5;
-        ">
-          Мы уже получили ваш заказ и скоро свяжемся с вами.
-        </p>
-
-        <button onclick="window.location.href='/rbc-store/'" style="
-          background: linear-gradient(90deg, #ff1e1e, #cc0000);
-          color: white;
-          border: none;
-          border-radius: 14px;
-          padding: 14px 26px;
-          font-size: 16px;
-          font-weight: 700;
-          cursor: pointer;
-          width: 100%;
-        ">
-          Вернуться в магазин
-        </button>
-      </div>
-    </div>
-  `;
-
-  window.history.replaceState({}, document.title, "/rbc-store/");
-}
-
-if (urlParams.get("cancel")) {
-  document.body.innerHTML = `
-    <div style="
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #0A0A0A;
-      color: white;
-      font-family: Montserrat, sans-serif;
-      padding: 20px;
-    ">
-      <div style="
-        width: 100%;
-        max-width: 500px;
-        background: #111;
-        border-radius: 20px;
-        padding: 40px 30px;
-        text-align: center;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-        border: 1px solid rgba(255,255,255,0.06);
-      ">
-        <div style="
-          font-size: 54px;
-          margin-bottom: 15px;
-        ">❌</div>
-
-        <h2 style="
-          margin: 0 0 12px;
-          font-size: 28px;
-          font-weight: 800;
-        ">
-          Оплата отменена
-        </h2>
-
-        <p style="
-          margin: 0 0 30px;
-          color: #bbb;
-          font-size: 16px;
-          line-height: 1.5;
-        ">
-          Вы можете вернуться в магазин и попробовать снова.
-        </p>
-
-        <button onclick="window.location.href='/rbc-store/'" style="
-          background: linear-gradient(90deg, #ff1e1e, #cc0000);
-          color: white;
-          border: none;
-          border-radius: 14px;
-          padding: 14px 26px;
-          font-size: 16px;
-          font-weight: 700;
-          cursor: pointer;
-          width: 100%;
-        ">
-          Вернуться в магазин
-        </button>
-      </div>
-    </div>
-  `;
-
-  window.history.replaceState({}, document.title, "/rbc-store/");
-}
-
-// 👉 ВЫБОР РАЗМЕРА И ЦВЕТА (ОДИН обработчик)
-document.addEventListener("click", (e) => {
-
-  // 👉 размер
-  if (e.target.closest(".sizes button")) {
-    const btn = e.target;
-
-    selectedSize = btn.innerText;
-
-    document.querySelectorAll(".sizes button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-
-    console.log("Размер:", selectedSize);
-    checkSelection();
-  }
-
-  // 👉 цвет
-  if (e.target.closest(".color")) {
-    const btn = e.target;
-
-    selectedColor = btn.classList[1];
-
-    document.querySelectorAll(".color").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-
-    console.log("Цвет:", selectedColor);
-    checkSelection();
-  }
-
-});
-
-// 👉 ПЕРЕВОДЫ
+// =========================
+// ПЕРЕВОДЫ И ТОВАРЫ
+// =========================
 const translations = {
   ru: {
     shop: "Магазин",
@@ -198,7 +30,6 @@ const translations = {
   }
 };
 
-// 👉 ТОВАРЫ
 const products = [
   {
     id: 1,
@@ -232,11 +63,144 @@ const products = [
       "https://images.pexels.com/photos/936075/pexels-photo-936075.jpeg",
       "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg"
     ]
-
   }
 ];
 
-// 👉 ЯЗЫК
+// =========================
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// =========================
+function persistCart() {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function persistFavorites() {
+  localStorage.setItem("favorites", JSON.stringify(favorites));
+}
+
+function showToast(text) {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+
+  toast.innerText = text;
+  toast.classList.add("show");
+
+  clearTimeout(showToast.timerId);
+  showToast.timerId = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2000);
+}
+
+// =========================
+// SUCCESS / CANCEL (ОДНО МЕСТО)
+// =========================
+function renderCheckoutStatusPage(status) {
+  const config = {
+    success: {
+      icon: "✅",
+      title: "Спасибо за покупку!",
+      paragraphs: [
+        "Оплата прошла успешно.",
+        "Мы уже получили ваш заказ и скоро свяжемся с вами."
+      ],
+      clearCart: true
+    },
+    cancel: {
+      icon: "❌",
+      title: "Оплата отменена",
+      paragraphs: ["Вы можете вернуться в магазин и попробовать снова."],
+      clearCart: false
+    }
+  }[status];
+
+  if (!config) return false;
+
+  if (config.clearCart) {
+    localStorage.removeItem("cart");
+    cart = [];
+  }
+
+  const descriptionHtml = config.paragraphs
+    .map((text, index) => {
+      const marginBottom = index === config.paragraphs.length - 1 ? 30 : 10;
+      return `
+        <p style="
+          margin: 0 0 ${marginBottom}px;
+          color: #bbb;
+          font-size: 16px;
+          line-height: 1.5;
+        ">
+          ${text}
+        </p>
+      `;
+    })
+    .join("");
+
+  document.body.innerHTML = `
+    <div style="
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #0A0A0A;
+      color: white;
+      font-family: Montserrat, sans-serif;
+      padding: 20px;
+    ">
+      <div style="
+        width: 100%;
+        max-width: 500px;
+        background: #111;
+        border-radius: 20px;
+        padding: 40px 30px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+        border: 1px solid rgba(255,255,255,0.06);
+      ">
+        <div style="
+          font-size: 54px;
+          margin-bottom: 15px;
+        ">${config.icon}</div>
+
+        <h2 style="
+          margin: 0 0 12px;
+          font-size: 28px;
+          font-weight: 800;
+        ">
+          ${config.title}
+        </h2>
+
+        ${descriptionHtml}
+
+        <button onclick="window.location.href='${SHOP_HOME_PATH}'" style="
+          background: linear-gradient(90deg, #ff1e1e, #cc0000);
+          color: white;
+          border: none;
+          border-radius: 14px;
+          padding: 14px 26px;
+          font-size: 16px;
+          font-weight: 700;
+          cursor: pointer;
+          width: 100%;
+        ">
+          Вернуться в магазин
+        </button>
+      </div>
+    </div>
+  `;
+
+  window.history.replaceState({}, document.title, SHOP_HOME_PATH);
+  return true;
+}
+
+function handleCheckoutStatusFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const status = urlParams.get("success") ? "success" : urlParams.get("cancel") ? "cancel" : null;
+  return renderCheckoutStatusPage(status);
+}
+
+// =========================
+// ЯЗЫК И ТОВАРЫ
+// =========================
 function setLang(selectedLang) {
   lang = selectedLang;
   updateText();
@@ -246,30 +210,30 @@ function setLang(selectedLang) {
 function updateText() {
   const shop = document.querySelector(".nav-shop");
   const hero = document.querySelector(".hero-text");
-  const btn = document.querySelector(".buy-btn");
+  const buyBtn = document.querySelector(".buy-btn");
   const cartLabel = document.querySelector(".cart-text");
 
   if (shop) shop.innerText = translations[lang].shop;
   if (hero) hero.innerText = translations[lang].hero;
-  if (btn) btn.innerText = translations[lang].buy;
+  if (buyBtn) buyBtn.innerText = translations[lang].buy;
   if (cartLabel) cartLabel.innerText = translations[lang].cart;
 }
 
-// 👉 РЕНДЕР ТОВАРОВ
 function renderProducts() {
   const container = document.getElementById("products");
+  if (!container) return;
+
   container.innerHTML = "";
 
-  products.forEach(product => {
+  products.forEach((product) => {
     container.innerHTML += `
       <div class="product-card">
-
         <div class="image-wrapper" onclick="openModal(${product.id})">
           <img src="${product.image}" class="main-img">
           <img src="${product.hoverImg}" class="hover-img">
         </div>
 
-        <div class="like-btn ${favorites.includes(product.name) ? 'active' : ''}">❤</div>
+        <div class="like-btn ${favorites.includes(product.name) ? "active" : ""}">❤</div>
 
         <div class="product-info">
           <h3>${product.name}</h3>
@@ -279,57 +243,69 @@ function renderProducts() {
         <button class="view-btn" onclick="event.stopPropagation(); openModal(${product.id})">
           СМОТРЕТЬ
         </button>
-
       </div>
     `;
   });
 }
 
-// 👉 МОДАЛКА
+// =========================
+// МОДАЛКА ТОВАРА
+// =========================
 function openModal(productId) {
-
-  // ❗ закрываем корзину если открыта
-
-
-  const product = products.find(p => p.id === productId);
+  const product = products.find((p) => p.id === productId);
+  if (!product) return;
 
   currentProduct = product;
   currentImageIndex = 0;
-
   selectedSize = null;
   selectedColor = null;
 
-  document.querySelectorAll(".sizes button").forEach(b => b.classList.remove("active"));
-  document.querySelectorAll(".color").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".sizes button").forEach((button) => button.classList.remove("active"));
+  document.querySelectorAll(".color").forEach((button) => button.classList.remove("active"));
 
-  document.getElementById("modal-title").innerText = product.name;
-  document.getElementById("modal-price").innerText = product.price + " ₽";
-  document.getElementById("modal-img").src = product.images[0];
+  const modalTitle = document.getElementById("modal-title");
+  const modalPrice = document.getElementById("modal-price");
+  const modalImg = document.getElementById("modal-img");
+  const modal = document.getElementById("modal");
+  const modalBuyBtn = document.getElementById("modal-buy");
 
-  document.getElementById("modal").style.display = "flex";
-  document.getElementById("modal-buy").disabled = true;
+  if (modalTitle) modalTitle.innerText = product.name;
+  if (modalPrice) modalPrice.innerText = `${product.price} ₽`;
+  if (modalImg) modalImg.src = product.images[0];
+  if (modal) modal.style.display = "flex";
+  if (modalBuyBtn) modalBuyBtn.disabled = true;
 }
 
-// 👉 ОБНОВЛЕНИЕ КАРТИНКИ
+function closeModal() {
+  const modal = document.getElementById("modal");
+  if (modal) modal.style.display = "none";
+}
+
 function updateModal() {
-  const img = document.getElementById("modal-img");
-
-  img.src = currentProduct.images[currentImageIndex];
+  const modalImg = document.getElementById("modal-img");
+  if (!modalImg || !currentProduct) return;
+  modalImg.src = currentProduct.images[currentImageIndex];
 }
 
-// 👉 ДОБАВЛЕНИЕ В КОРЗИНУ
-function addToCart(id, size, color) {
-  const product = products.find(p => p.id === id);
+function checkSelection() {
+  const modalBuyBtn = document.getElementById("modal-buy");
+  if (!modalBuyBtn) return;
+  modalBuyBtn.disabled = !(selectedSize && selectedColor);
+}
 
-  // 👉 ищем такой же товар
-  const existing = cart.find(item =>
-    item.id === id &&
-    item.size === size &&
-    item.color === color
+// =========================
+// КОРЗИНА
+// =========================
+function addToCart(id, size, color) {
+  const product = products.find((p) => p.id === id);
+  if (!product) return;
+
+  const existing = cart.find(
+    (item) => item.id === id && item.size === size && item.color === color
   );
 
   if (existing) {
-    existing.qty += 1; // увеличиваем количество
+    existing.qty += 1;
   } else {
     cart.push({
       ...product,
@@ -339,24 +315,14 @@ function addToCart(id, size, color) {
     });
   }
 
-  localStorage.setItem("cart", JSON.stringify(cart));
+  persistCart();
   updateCartCount();
   showToast("Добавлено в корзину");
 }
 
-function checkSelection() {
-  const btn = document.getElementById("modal-buy");
-
-  if (selectedSize && selectedColor) {
-    btn.disabled = false;
-  } else {
-    btn.disabled = true;
-  }
-}
-
-// 👉 СЧЕТЧИК
 function updateCartCount() {
   const countEl = document.getElementById("cart-count");
+  if (!countEl) return;
 
   if (cart.length === 0) {
     countEl.style.display = "none";
@@ -365,43 +331,11 @@ function updateCartCount() {
     countEl.textContent = cart.length;
   }
 
-  // анимация
   countEl.classList.remove("animate");
   void countEl.offsetWidth;
   countEl.classList.add("animate");
 }
 
-// 👉 КНОПКА "В КОРЗИНУ"
-document.getElementById("modal-buy").addEventListener("click", () => {
-
-  if (!currentProduct) return;
-
-  if (!selectedSize || !selectedColor) {
-    alert("Выбери размер и цвет");
-    return;
-  }
-
-  addToCart(currentProduct.id, selectedSize, selectedColor);
-
-   renderCart();
-
-  document.getElementById("modal").style.display = "none";
-});
-
-// 👉 ЗАКРЫТИЕ МОДАЛКИ
-document.querySelector(".close").addEventListener("click", () => {
-  document.getElementById("modal").style.display = "none";
-});
-
-// 👉 ЛАЙК
-document.addEventListener("click", function(e) {
-  if (e.target.classList.contains("like-btn")) {
-    e.target.classList.toggle("active");
-  }
-});
-
-
-// рендер корзины
 function renderCart() {
   const container = document.getElementById("cart-items");
   const totalEl = document.getElementById("cart-total");
@@ -410,7 +344,6 @@ function renderCart() {
 
   container.innerHTML = "";
 
-  // ✅ ЕСЛИ КОРЗИНА ПУСТА
   if (cart.length === 0) {
     container.innerHTML = `
       <div class="empty-cart">
@@ -435,118 +368,69 @@ function renderCart() {
         <small>${item.size} / ${item.color}</small>
       </div>
 
-     <div>
-  <p>${item.price} ₽ × ${item.qty}</p>
-
-  <div class="qty-controls">
-    <button onclick="changeQty(${index}, -1)">-</button>
-    <span>${item.qty}</span>
-    <button onclick="changeQty(${index}, 1)">+</button>
-  </div>
-
-  <button onclick="removeFromCart(${index})">✕</button>
-</div>
+      <div>
+        <p>${item.price} ₽ × ${item.qty}</p>
+        <div class="qty-controls">
+          <button onclick="changeQty(${index}, -1)">-</button>
+          <span>${item.qty}</span>
+          <button onclick="changeQty(${index}, 1)">+</button>
+        </div>
+        <button onclick="removeFromCart(${index})">✕</button>
+      </div>
     `;
 
     container.appendChild(div);
   });
 
-  totalEl.innerText = "Итого: " + total + " ₽";
+  totalEl.innerText = `Итого: ${total} ₽`;
 }
 
 function removeFromCart(index) {
   cart.splice(index, 1);
-
-  localStorage.setItem("cart", JSON.stringify(cart));
-
+  persistCart();
   updateCartCount();
   renderCart();
 }
 
-const cartEl = document.getElementById("cart");
-const overlay = document.getElementById("overlay");
-const cartBtn = document.querySelector(".nav-cart");
-const closeCartBtn = document.getElementById("close-cart");
+function changeQty(index, delta) {
+  if (!cart[index]) return;
 
-// ОТКРЫТИЕ
-cartBtn.addEventListener("click", (e) => {
-  e.preventDefault();
-  e.stopPropagation(); 
+  cart[index].qty += delta;
+  if (cart[index].qty <= 0) {
+    cart.splice(index, 1);
+  }
 
-   // 🔥 закрываем модалку
-  document.getElementById("modal").style.display = "none";
-
-  cartEl.classList.add("active");
-  overlay.classList.add("active");
-
-  document.body.classList.add("no-scroll"); // 🔥 ВОТ ЭТО
-
+  persistCart();
+  updateCartCount();
   renderCart();
-});
-
-cartEl.addEventListener("click", (e) => {
-  e.stopPropagation();
-});
-
-// ЗАКРЫТИЕ
-function closeCart() {
-  cartEl.classList.remove("active");
-  overlay.classList.remove("active");
-
-  document.body.classList.remove("no-scroll"); // 🔥 ВОТ ЭТО
-   document.activeElement.blur();
 }
 
-overlay.addEventListener("click", closeCart);
-closeCartBtn.addEventListener("click", closeCart);
-
-// 👉 Закрытие корзины по ESC
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    closeCart();
-    document.getElementById("modal").style.display = "none";
-  }
-});
-
-// 👉 Подключаем стрелки
-document.getElementById("prev").addEventListener("click", () => {
-  if (!currentProduct) return;
-
-  currentImageIndex--;
-
-  if (currentImageIndex < 0) {
-    currentImageIndex = currentProduct.images.length - 1;
-  }
-
-  updateModal();
-});
-
-document.getElementById("next").addEventListener("click", () => {
-  if (!currentProduct) return;
-
-  currentImageIndex++;
-
-  if (currentImageIndex >= currentProduct.images.length) {
-    currentImageIndex = 0;
-  }
-
-  updateModal();
-});
-
-// 👉 отчистка корзины
-document.getElementById("clear-cart").addEventListener("click", () => {
+function clearCart() {
   cart = [];
-  localStorage.setItem("cart", JSON.stringify(cart));
+  persistCart();
   updateCartCount();
   renderCart();
-});
+}
 
-// ✅ ОФОРМЛЕНИЕ ЗАКАЗА
-document.querySelector(".checkout-btn").addEventListener("click", () => {
+function closeCart() {
+  const cartEl = document.getElementById("cart");
+  const overlay = document.getElementById("overlay");
 
+  if (cartEl) cartEl.classList.remove("active");
+  if (overlay) overlay.classList.remove("active");
+
+  document.body.classList.remove("no-scroll");
+  if (document.activeElement && typeof document.activeElement.blur === "function") {
+    document.activeElement.blur();
+  }
+}
+
+// =========================
+// ОФОРМЛЕНИЕ ЗАКАЗА (STRIPE)
+// =========================
+function handleCheckout() {
   const btn = document.querySelector(".checkout-btn");
-
-  if (btn.disabled) return;
+  if (!btn || btn.disabled) return;
 
   btn.disabled = true;
   btn.innerText = "Переход к оплате...";
@@ -558,9 +442,13 @@ document.querySelector(".checkout-btn").addEventListener("click", () => {
     return;
   }
 
-  const name = document.getElementById("customer-name").value;
-  const phone = document.getElementById("customer-phone").value;
-  const address = document.getElementById("customer-address").value;
+  const nameInput = document.getElementById("customer-name");
+  const phoneInput = document.getElementById("customer-phone");
+  const addressInput = document.getElementById("customer-address");
+
+  const name = nameInput ? nameInput.value : "";
+  const phone = phoneInput ? phoneInput.value : "";
+  const address = addressInput ? addressInput.value : "";
 
   if (!name || !phone || !address) {
     alert("Заполните все поля");
@@ -569,7 +457,6 @@ document.querySelector(".checkout-btn").addEventListener("click", () => {
     return;
   }
 
-  // 👉 отправка в backend для Stripe
   fetch("https://rbc-store.onrender.com/create-checkout-session", {
     method: "POST",
     headers: {
@@ -582,122 +469,166 @@ document.querySelector(".checkout-btn").addEventListener("click", () => {
       address
     })
   })
-  .then(res => res.json())
-  .then(data => {
-    // 👉 редирект на оплату
-    window.location.href = data.url;
-  })
-  .catch(() => {
-    alert("Ошибка оплаты 😢");
-    btn.disabled = false;
-    btn.innerText = "Оформить заказ";
-  });
-
-});
-
-//УВЕДОМЛЕНИЕ "ДОБАВЛЕНО В КОРЗИНУ"
-function showToast(text) {
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.innerText = text;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.classList.add("show");
-  }, 10);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 2000);
-}
-
-//КНОПКА "КУПИТЬ" В HERO
-document.querySelector(".buy-btn").addEventListener("click", () => {
-  document.getElementById("products").scrollIntoView({
-    behavior: "smooth"
-  });
-});
-
-//отправка заказа в Telegram
-const TELEGRAM_TOKEN = "8633471473:AAHBKp17NO60xf4XKk8HVSbWEpe0yEDfd4E";
-const CHAT_ID = "8410151779";
-
-// функция отправки
-function sendOrderToTelegram(text) {
-  fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      chat_id: CHAT_ID,
-      text: text
+    .then((res) => res.json())
+    .then((data) => {
+      window.location.href = data.url;
     })
-  })
-  .then(res => res.json())
-  .then(data => console.log("Отправлено:", data))
-  .catch(err => console.error("Ошибка:", err));
+    .catch(() => {
+      alert("Ошибка оплаты 😢");
+      btn.disabled = false;
+      btn.innerText = "Оформить заказ";
+    });
 }
 
-//ФУНКЦИЯ ЗАКРЫТИЯ
-function closeSuccess() {
-  document.getElementById("success-modal").style.display = "none";
-}
-
-//ФУНКЦИЯ + - товары в корзине
-function changeQty(index, delta) {
-  cart[index].qty += delta;
-
-  if (cart[index].qty <= 0) {
-    cart.splice(index, 1);
+// =========================
+// ОБРАБОТЧИКИ СОБЫТИЙ UI
+// =========================
+function handleDocumentClick(e) {
+  const sizeBtn = e.target.closest(".sizes button");
+  if (sizeBtn) {
+    selectedSize = sizeBtn.innerText;
+    document.querySelectorAll(".sizes button").forEach((button) => button.classList.remove("active"));
+    sizeBtn.classList.add("active");
+    checkSelection();
   }
 
-  localStorage.setItem("cart", JSON.stringify(cart));
+  const colorBtn = e.target.closest(".color");
+  if (colorBtn) {
+    selectedColor = Array.from(colorBtn.classList).find(
+      (className) => className !== "color" && className !== "active"
+    ) || null;
+    document.querySelectorAll(".color").forEach((button) => button.classList.remove("active"));
+    colorBtn.classList.add("active");
+    checkSelection();
+  }
 
-  updateCartCount();
-  renderCart();
-}
-
-function showToast(text) {
-  const toast = document.getElementById("toast");
-  toast.innerText = text;
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2000);
-}
-
-let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-
-document.addEventListener("click", function(e) {
   if (e.target.classList.contains("like-btn")) {
-
     const card = e.target.closest(".product-card");
-    const name = card.querySelector("h3").innerText;
+    if (!card) return;
+
+    const title = card.querySelector("h3");
+    const name = title ? title.innerText : "";
+    if (!name) return;
 
     if (favorites.includes(name)) {
-      favorites = favorites.filter(f => f !== name);
+      favorites = favorites.filter((favorite) => favorite !== name);
       e.target.classList.remove("active");
     } else {
       favorites.push(name);
       e.target.classList.add("active");
     }
 
-    localStorage.setItem("favorites", JSON.stringify(favorites));
+    persistFavorites();
+  }
+}
+
+document.addEventListener("click", handleDocumentClick);
+
+const modalBuyBtn = document.getElementById("modal-buy");
+if (modalBuyBtn) {
+  modalBuyBtn.addEventListener("click", () => {
+    if (!currentProduct) return;
+
+    if (!selectedSize || !selectedColor) {
+      alert("Выбери размер и цвет");
+      return;
+    }
+
+    addToCart(currentProduct.id, selectedSize, selectedColor);
+    renderCart();
+    closeModal();
+  });
+}
+
+const closeModalBtn = document.querySelector(".close");
+if (closeModalBtn) {
+  closeModalBtn.addEventListener("click", closeModal);
+}
+
+const cartEl = document.getElementById("cart");
+const overlay = document.getElementById("overlay");
+const cartBtn = document.querySelector(".nav-cart");
+const closeCartBtn = document.getElementById("close-cart");
+
+if (cartBtn && cartEl && overlay) {
+  cartBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    closeModal();
+    cartEl.classList.add("active");
+    overlay.classList.add("active");
+    document.body.classList.add("no-scroll");
+    renderCart();
+  });
+}
+
+if (cartEl) {
+  cartEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+}
+
+if (overlay) overlay.addEventListener("click", closeCart);
+if (closeCartBtn) closeCartBtn.addEventListener("click", closeCart);
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeCart();
+    closeModal();
   }
 });
 
+const prevBtn = document.getElementById("prev");
+if (prevBtn) {
+  prevBtn.addEventListener("click", () => {
+    if (!currentProduct) return;
+    currentImageIndex -= 1;
+    if (currentImageIndex < 0) currentImageIndex = currentProduct.images.length - 1;
+    updateModal();
+  });
+}
+
+const nextBtn = document.getElementById("next");
+if (nextBtn) {
+  nextBtn.addEventListener("click", () => {
+    if (!currentProduct) return;
+    currentImageIndex += 1;
+    if (currentImageIndex >= currentProduct.images.length) currentImageIndex = 0;
+    updateModal();
+  });
+}
+
+const clearCartBtn = document.getElementById("clear-cart");
+if (clearCartBtn) clearCartBtn.addEventListener("click", clearCart);
+
+const checkoutBtn = document.querySelector(".checkout-btn");
+if (checkoutBtn) checkoutBtn.addEventListener("click", handleCheckout);
+
+const buyBtn = document.querySelector(".buy-btn");
+if (buyBtn) {
+  buyBtn.addEventListener("click", () => {
+    const productsBlock = document.getElementById("products");
+    if (!productsBlock) return;
+    productsBlock.scrollIntoView({ behavior: "smooth" });
+  });
+}
+
 const burger = document.querySelector(".burger");
 const nav = document.querySelector("nav");
+if (burger && nav) {
+  burger.addEventListener("click", () => {
+    nav.classList.toggle("active");
+  });
+}
 
-burger.addEventListener("click", () => {
-  nav.classList.toggle("active");
-});
-
-// 👉 СТАРТ
-updateText();
-renderProducts();
-updateCartCount();
-renderCart(); // 🔥 ВАЖНО
+// =========================
+// СТАРТ ПРИЛОЖЕНИЯ
+// =========================
+const isCheckoutStatusRendered = handleCheckoutStatusFromUrl();
+if (!isCheckoutStatusRendered) {
+  updateText();
+  renderProducts();
+  updateCartCount();
+  renderCart();
+}

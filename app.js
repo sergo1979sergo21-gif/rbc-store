@@ -206,7 +206,7 @@ function renderProducts() {
 
   products.forEach((product) => {
     container.innerHTML += `
-      <div class="product-card">
+      <article class="product-card product-grid__card">
         <div class="image-wrapper" onclick="openModal(${product.id})">
           <img src="${product.image}" class="main-img">
           <img src="${product.hoverImg}" class="hover-img">
@@ -222,7 +222,7 @@ function renderProducts() {
         <button class="view-btn" onclick="event.stopPropagation(); openModal(${product.id})">
           СМОТРЕТЬ
         </button>
-      </div>
+      </article>
     `;
   });
 }

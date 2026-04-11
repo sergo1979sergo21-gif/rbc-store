@@ -24,9 +24,16 @@
       <div class="site-header__inner">
         <div class="logo site-header__logo">RBC</div>
 
-        <div class="burger site-header__burger" role="button" aria-label="Открыть меню">☰</div>
+        <div
+          class="burger site-header__burger"
+          role="button"
+          tabindex="0"
+          aria-label="Открыть меню"
+          aria-expanded="false"
+          aria-controls="main-nav"
+        >☰</div>
 
-        <nav class="nav site-header__nav" aria-label="Основная навигация">
+        <nav id="main-nav" class="nav site-header__nav" aria-label="Основная навигация">
           <a href="#products" class="nav-shop site-header__link">Магазин</a>
           <button class="nav-cart site-header__cart-button" type="button">
             <span class="cart-text">Корзина</span>
@@ -64,12 +71,12 @@
       </section>
     </main>
 
-    <div id="modal" class="modal product-modal" role="dialog" aria-modal="true" aria-label="Карточка товара">
+    <div id="modal" class="modal product-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div class="modal-content product-modal__content">
         <span class="close product-modal__close">&times;</span>
 
         <div class="modal-image-wrapper product-modal__image-wrapper">
-          <img id="modal-img" class="product-modal__image">
+          <img id="modal-img" class="product-modal__image" alt="Изображение товара">
 
           <button id="prev" class="arrow left product-modal__arrow product-modal__arrow--prev" type="button">‹</button>
           <button id="next" class="arrow right product-modal__arrow product-modal__arrow--next" type="button">›</button>
@@ -107,7 +114,7 @@
     <aside id="cart" class="cart cart-sidebar" aria-label="Корзина">
       <div class="cart-header cart-sidebar__header">
         <h2 class="cart-sidebar__title">Корзина</h2>
-        <span id="close-cart" class="cart-sidebar__close" role="button" aria-label="Закрыть корзину">✕</span>
+      <span id="close-cart" class="cart-sidebar__close" role="button" tabindex="0" aria-label="Закрыть корзину">✕</span>
       </div>
 
       <div id="cart-items" class="cart-sidebar__items"></div>

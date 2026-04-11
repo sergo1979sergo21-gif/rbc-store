@@ -278,6 +278,7 @@ function renderProducts() {
     const displayTitle = product.catalogTitle || product.name.toUpperCase();
     const displaySubtitle = product.catalogSubtitle || "ATHLETIC FIT";
     const displayColor = product.catalogColor || "BLACK";
+    const displayLabel = product.id % 2 === 0 ? "RBC CORE COLLECTION" : "RBC DROP 01";
     const formattedPrice = `${Number(product.price).toLocaleString("ru-RU")} ₽`;
 
     container.innerHTML += `
@@ -307,16 +308,16 @@ function renderProducts() {
         <div class="like-btn ${favorites.includes(product.name) ? "active" : ""}" data-favorite-key="${product.name}">❤</div>
 
         <div class="product-info catalog-card__content">
-          <p class="catalog-card__eyebrow">RBC SPORTSWEAR</p>
+          <p class="catalog-card__eyebrow">${displayLabel}</p>
           <h3 class="catalog-card__title">${displayTitle}</h3>
           <p class="catalog-card__subtitle">${displaySubtitle}</p>
 
           <div class="catalog-card__meta">
             <div class="catalog-card__sizes">
-              <span>S</span>
-              <span>M</span>
-              <span>L</span>
-              <span>XL</span>
+              <button class="catalog-card__size-btn" type="button">S</button>
+              <button class="catalog-card__size-btn" type="button">M</button>
+              <button class="catalog-card__size-btn" type="button">L</button>
+              <button class="catalog-card__size-btn" type="button">XL</button>
             </div>
             <p class="catalog-card__color">COLOR: ${displayColor}</p>
           </div>
@@ -325,7 +326,7 @@ function renderProducts() {
         </div>
 
         <button class="view-btn catalog-card__cta" onclick="event.stopPropagation(); openModal(${product.id})">
-          ADD TO CART
+          BUY NOW
         </button>
       </article>
     `;
@@ -614,6 +615,18 @@ async function handleCheckout() {
 // ОБРАБОТЧИКИ СОБЫТИЙ UI
 // =========================
 function handleDocumentClick(e) {
+  const catalogSizeBtn = e.target.closest(".catalog-card__size-btn");
+  if (catalogSizeBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const sizeGroup = catalogSizeBtn.closest(".catalog-card__sizes");
+    if (!sizeGroup) return;
+
+    sizeGroup.querySelectorAll(".catalog-card__size-btn").forEach((button) => button.classList.remove("is-active"));
+    catalogSizeBtn.classList.add("is-active");
+    return;
+  }
+
   const sizeBtn = e.target.closest(".sizes button");
   if (sizeBtn) {
     selectedSize = sizeBtn.innerText;

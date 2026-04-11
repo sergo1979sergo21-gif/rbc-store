@@ -64,9 +64,12 @@ const products = [
     catalogColor: "GRAPHITE",
     price: 4990,
     images: {
-      front: "image/tshirt-front.png",
-      back: "image/tshirt-back.png",
-      gallery: ["image/tshirt-detail.png", "image/tshirt-side.png"]
+      front: "https://images.pexels.com/photos/6311603/pexels-photo-6311603.jpeg?auto=compress&cs=tinysrgb&w=800",
+      back: "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg?auto=compress&cs=tinysrgb&w=800",
+      gallery: [
+        "https://images.pexels.com/photos/6311603/pexels-photo-6311603.jpeg",
+        "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg"
+      ]
     }
   },
   {
@@ -77,9 +80,12 @@ const products = [
     catalogColor: "JET BLACK",
     price: 1990,
     images: {
-      front: "image/tshirt-front.png",
-      back: "image/tshirt-back.png",
-      gallery: ["image/tshirt-detail.png", "image/tshirt-side.png"]
+      front: "https://images.pexels.com/photos/936075/pexels-photo-936075.jpeg?auto=compress&cs=tinysrgb&w=800",
+      back: "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg?auto=compress&cs=tinysrgb&w=800",
+      gallery: [
+        "https://images.pexels.com/photos/936075/pexels-photo-936075.jpeg",
+        "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg"
+      ]
     }
   }
 ];

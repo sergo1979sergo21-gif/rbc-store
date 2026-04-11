@@ -46,6 +46,9 @@ const products = [
   {
     id: 1,
     name: "Футболка RBC",
+    catalogTitle: "RBC ATHLETIC T-SHIRT",
+    catalogSubtitle: "OVERSIZED FIT",
+    catalogColor: "BLACK",
     price: 2490,
     image: "https://images.pexels.com/photos/5325589/pexels-photo-5325589.jpeg?auto=compress&cs=tinysrgb&w=800",
     hoverImg: "https://images.pexels.com/photos/5325589/pexels-photo-5325589.jpeg?auto=compress&cs=tinysrgb&w=800",
@@ -57,6 +60,9 @@ const products = [
   {
     id: 2,
     name: "Худи RBC",
+    catalogTitle: "RBC PERFORMANCE HOODIE",
+    catalogSubtitle: "RELAXED FIT",
+    catalogColor: "GRAPHITE",
     price: 4990,
     image: "https://images.pexels.com/photos/6311603/pexels-photo-6311603.jpeg?auto=compress&cs=tinysrgb&w=800",
     hoverImg: "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg?auto=compress&cs=tinysrgb&w=800",
@@ -68,6 +74,9 @@ const products = [
   {
     id: 3,
     name: "Шорты RBC",
+    catalogTitle: "RBC TRAINING SHORTS",
+    catalogSubtitle: "ATHLETIC CUT",
+    catalogColor: "JET BLACK",
     price: 1990,
     image: "https://images.pexels.com/photos/936075/pexels-photo-936075.jpeg?auto=compress&cs=tinysrgb&w=800",
     hoverImg: "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg?auto=compress&cs=tinysrgb&w=800",
@@ -216,22 +225,57 @@ function renderProducts() {
   container.innerHTML = "";
 
   products.forEach((product) => {
+    const displayTitle = product.catalogTitle || product.name.toUpperCase();
+    const displaySubtitle = product.catalogSubtitle || "ATHLETIC FIT";
+    const displayColor = product.catalogColor || "BLACK";
+    const formattedPrice = `${Number(product.price).toLocaleString("ru-RU")} ₽`;
+
     container.innerHTML += `
-      <article class="product-card product-grid__card">
-        <div class="image-wrapper" onclick="openModal(${product.id})">
-          <img src="${product.image}" class="main-img">
-          <img src="${product.hoverImg}" class="hover-img">
+      <article class="product-card product-grid__card catalog-card" data-product-id="${product.id}" data-view="front">
+        <div class="image-wrapper catalog-card__media" onclick="openModal(${product.id})">
+          <img src="${product.image}" class="main-img catalog-card__img catalog-card__img--front" alt="${displayTitle} FRONT">
+          <img src="${product.hoverImg}" class="hover-img catalog-card__img catalog-card__img--back" alt="${displayTitle} BACK">
+
+          <div class="catalog-card__view-switch" onclick="event.stopPropagation()">
+            <button
+              class="catalog-card__view-btn is-active"
+              type="button"
+              onclick="setCatalogCardView(this, 'front', event)"
+            >
+              FRONT
+            </button>
+            <button
+              class="catalog-card__view-btn"
+              type="button"
+              onclick="setCatalogCardView(this, 'back', event)"
+            >
+              BACK
+            </button>
+          </div>
         </div>
 
-        <div class="like-btn ${favorites.includes(product.name) ? "active" : ""}">❤</div>
+        <div class="like-btn ${favorites.includes(product.name) ? "active" : ""}" data-favorite-key="${product.name}">❤</div>
 
-        <div class="product-info">
-          <h3>${product.name}</h3>
-          <p class="price">${product.price} ₽</p>
+        <div class="product-info catalog-card__content">
+          <p class="catalog-card__eyebrow">RBC SPORTSWEAR</p>
+          <h3 class="catalog-card__title">${displayTitle}</h3>
+          <p class="catalog-card__subtitle">${displaySubtitle}</p>
+
+          <div class="catalog-card__meta">
+            <div class="catalog-card__sizes">
+              <span>S</span>
+              <span>M</span>
+              <span>L</span>
+              <span>XL</span>
+            </div>
+            <p class="catalog-card__color">COLOR: ${displayColor}</p>
+          </div>
+
+          <p class="price catalog-card__price">${formattedPrice}</p>
         </div>
 
-        <button class="view-btn" onclick="event.stopPropagation(); openModal(${product.id})">
-          СМОТРЕТЬ
+        <button class="view-btn catalog-card__cta" onclick="event.stopPropagation(); openModal(${product.id})">
+          ADD TO CART
         </button>
       </article>
     `;
@@ -275,6 +319,23 @@ function updateModal() {
   const modalImg = document.getElementById("modal-img");
   if (!modalImg || !currentProduct) return;
   modalImg.src = currentProduct.images[currentImageIndex];
+}
+
+function setCatalogCardView(buttonEl, view, event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  const card = buttonEl ? buttonEl.closest(".catalog-card") : null;
+  if (!card) return;
+
+  const selectedView = view === "back" ? "back" : "front";
+  card.dataset.view = selectedView;
+
+  card.querySelectorAll(".catalog-card__view-btn").forEach((button) => {
+    button.classList.toggle("is-active", button === buttonEl);
+  });
 }
 
 function checkSelection() {
@@ -531,18 +592,14 @@ function handleDocumentClick(e) {
   }
 
   if (e.target.classList.contains("like-btn")) {
-    const card = e.target.closest(".product-card");
-    if (!card) return;
+    const favoriteKey = e.target.dataset.favoriteKey || "";
+    if (!favoriteKey) return;
 
-    const title = card.querySelector("h3");
-    const name = title ? title.innerText : "";
-    if (!name) return;
-
-    if (favorites.includes(name)) {
-      favorites = favorites.filter((favorite) => favorite !== name);
+    if (favorites.includes(favoriteKey)) {
+      favorites = favorites.filter((favorite) => favorite !== favoriteKey);
       e.target.classList.remove("active");
     } else {
-      favorites.push(name);
+      favorites.push(favoriteKey);
       e.target.classList.add("active");
     }
 

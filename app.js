@@ -10,6 +10,7 @@ let selectedColor = null;
 let currentProduct = null;
 let currentImageIndex = 0;
 let isCheckoutRequestInFlight = false;
+let showFavoritesOnly = false;
 
 const SHOP_HOME_PATH = "/rbc-store/";
 
@@ -40,6 +41,11 @@ const translations = {
     footerContacts: "Контакты",
     emptyFavoritesTitle: "Нет избранных товаров",
     emptyFavoritesSubtitle: "Нажмите на ❤️ чтобы сохранить",
+    favoritesFilter: "Только избранное",
+    favoritesFilterActive: "Показаны избранные",
+    favoriteTooltip: "Добавить в избранное",
+    viewProduct: "Смотреть",
+    modalAddToCart: "Добавить в корзину",
     checkoutNameRequired: "Введите имя",
     checkoutPhoneRequired: "Введите телефон",
     checkoutAddressRequired: "Введите адрес доставки",
@@ -60,6 +66,11 @@ const translations = {
     footerContacts: "Contacts",
     emptyFavoritesTitle: "No favorite products",
     emptyFavoritesSubtitle: "Tap ❤️ to save items",
+    favoritesFilter: "Favorites only",
+    favoritesFilterActive: "Showing favorites",
+    favoriteTooltip: "Add to favorites",
+    viewProduct: "View",
+    modalAddToCart: "Add to cart",
     checkoutNameRequired: "Enter your name",
     checkoutPhoneRequired: "Enter phone number",
     checkoutAddressRequired: "Enter delivery address",
@@ -223,6 +234,10 @@ function cleanCheckoutQueryParams() {
   window.history.replaceState({}, document.title, cleanUrl);
 }
 
+function getStoreHomeUrl() {
+  return `${window.location.origin}${window.location.pathname}`;
+}
+
 // =========================
 // SUCCESS / CANCEL (ОДНО МЕСТО)
 // =========================
@@ -271,7 +286,7 @@ function renderCheckoutStatusPage(status) {
   });
 
   homeBtn.onclick = () => {
-    window.location.href = SHOP_HOME_PATH;
+    window.location.href = getStoreHomeUrl();
   };
 
   appContent.hidden = true;
@@ -373,6 +388,7 @@ function updateText() {
   const footerContacts = document.getElementById("footer-nav-contacts");
   const emptyFavoritesTitle = document.getElementById("products-empty-title");
   const emptyFavoritesSubtitle = document.getElementById("products-empty-subtitle");
+  const modalBuyButton = document.getElementById("modal-buy");
 
   if (shop) shop.innerText = translations[lang].shop;
   if (hero) hero.innerText = translations[lang].hero;
@@ -385,6 +401,21 @@ function updateText() {
   if (footerContacts) footerContacts.innerText = translations[lang].footerContacts;
   if (emptyFavoritesTitle) emptyFavoritesTitle.innerText = translations[lang].emptyFavoritesTitle;
   if (emptyFavoritesSubtitle) emptyFavoritesSubtitle.innerText = translations[lang].emptyFavoritesSubtitle;
+  if (modalBuyButton) modalBuyButton.innerText = translations[lang].modalAddToCart;
+
+  updateFavoritesToggleButton();
+}
+
+function updateFavoritesToggleButton() {
+  const favoritesToggleBtn = document.getElementById("favorites-toggle");
+  if (!favoritesToggleBtn) return;
+
+  const buttonLabel = showFavoritesOnly
+    ? translations[lang].favoritesFilterActive
+    : translations[lang].favoritesFilter;
+  favoritesToggleBtn.innerText = buttonLabel;
+  favoritesToggleBtn.classList.toggle("is-active", showFavoritesOnly);
+  favoritesToggleBtn.setAttribute("aria-pressed", showFavoritesOnly ? "true" : "false");
 }
 
 function renderProducts() {
@@ -396,9 +427,9 @@ function renderProducts() {
   if (emptyState) emptyState.hidden = true;
 
   const visibleProducts = products.filter((product) => favorites.includes(product.name));
-  const dataSource = favorites.length > 0 && visibleProducts.length > 0 ? visibleProducts : products;
+  const dataSource = showFavoritesOnly ? visibleProducts : products;
 
-  if (favorites.length > 0 && visibleProducts.length === 0) {
+  if (showFavoritesOnly && visibleProducts.length === 0) {
     if (emptyState) emptyState.hidden = false;
     return;
   }
@@ -417,7 +448,12 @@ function renderProducts() {
           <img src="${cardImages.back}" class="hover-img catalog-card__img catalog-card__img--back" alt="${displayTitle} BACK">
         </div>
 
-        <div class="like-btn ${favorites.includes(product.name) ? "active" : ""}" data-favorite-key="${product.name}">❤</div>
+        <div
+          class="like-btn ${favorites.includes(product.name) ? "active" : ""}"
+          data-favorite-key="${product.name}"
+          data-tooltip="${translations[lang].favoriteTooltip}"
+          aria-label="${translations[lang].favoriteTooltip}"
+        >❤</div>
 
         <div class="product-info catalog-card__content">
           <p class="catalog-card__eyebrow">${displayLabel}</p>
@@ -428,7 +464,7 @@ function renderProducts() {
         </div>
 
         <button class="view-btn catalog-card__cta" onclick="event.stopPropagation(); openModal(${product.id})">
-          Купить
+          ${translations[lang].viewProduct}
         </button>
       </article>
     `;
@@ -796,6 +832,9 @@ function handleDocumentClick(e) {
     }
 
     persistFavorites();
+    if (showFavoritesOnly) {
+      renderProducts();
+    }
   }
 }
 
@@ -899,6 +938,15 @@ const buyBtn = document.querySelector(".buy-btn");
 if (buyBtn) {
   buyBtn.addEventListener("click", () => {
     scrollToProductsSection();
+  });
+}
+
+const favoritesToggleBtn = document.getElementById("favorites-toggle");
+if (favoritesToggleBtn) {
+  favoritesToggleBtn.addEventListener("click", () => {
+    showFavoritesOnly = !showFavoritesOnly;
+    updateFavoritesToggleButton();
+    renderProducts();
   });
 }
 

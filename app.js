@@ -33,14 +33,36 @@ const translations = {
     cart: "Корзина",
     hero: "СОЗДАНО ДЛЯ РЕЗУЛЬТАТА",
     buy: "КАТАЛОГ",
-    productsTitle: "Премиальная тренировочная коллекция"
+    productsTitle: "Премиальная тренировочная коллекция",
+    footerCatalog: "Каталог",
+    footerAbout: "О бренде",
+    footerDelivery: "Доставка",
+    footerContacts: "Контакты",
+    emptyFavoritesTitle: "Нет избранных товаров",
+    emptyFavoritesSubtitle: "Нажмите на ❤️ чтобы сохранить",
+    checkoutNameRequired: "Введите имя",
+    checkoutPhoneRequired: "Введите телефон",
+    checkoutAddressRequired: "Введите адрес доставки",
+    checkoutSuccessTitle: "Спасибо за заказ",
+    checkoutSuccessSubtitle: "Мы свяжемся с вами в ближайшее время"
   },
   en: {
     shop: "Shop",
     cart: "Cart",
     hero: "BUILT FOR PERFORMANCE",
     buy: "SHOP NOW",
-    productsTitle: "Premium Training Essentials"
+    productsTitle: "Premium Training Essentials",
+    footerCatalog: "Catalog",
+    footerAbout: "About",
+    footerDelivery: "Delivery",
+    footerContacts: "Contacts",
+    emptyFavoritesTitle: "No favorite products",
+    emptyFavoritesSubtitle: "Tap ❤️ to save items",
+    checkoutNameRequired: "Enter your name",
+    checkoutPhoneRequired: "Enter phone number",
+    checkoutAddressRequired: "Enter delivery address",
+    checkoutSuccessTitle: "Thank you for your order",
+    checkoutSuccessSubtitle: "We will contact you shortly"
   }
 };
 
@@ -343,21 +365,43 @@ function updateText() {
   const buyBtn = document.querySelector(".buy-btn");
   const cartLabel = document.querySelector(".cart-text");
   const productsTitle = document.querySelector(".site-products-section__title");
+  const footerCatalog = document.getElementById("footer-nav-catalog");
+  const footerAbout = document.getElementById("footer-nav-about");
+  const footerDelivery = document.getElementById("footer-nav-delivery");
+  const footerContacts = document.getElementById("footer-nav-contacts");
+  const emptyFavoritesTitle = document.getElementById("products-empty-title");
+  const emptyFavoritesSubtitle = document.getElementById("products-empty-subtitle");
 
   if (shop) shop.innerText = translations[lang].shop;
   if (hero) hero.innerText = translations[lang].hero;
   if (buyBtn) buyBtn.innerText = translations[lang].buy;
   if (cartLabel) cartLabel.innerText = translations[lang].cart;
   if (productsTitle) productsTitle.innerText = translations[lang].productsTitle;
+  if (footerCatalog) footerCatalog.innerText = translations[lang].footerCatalog;
+  if (footerAbout) footerAbout.innerText = translations[lang].footerAbout;
+  if (footerDelivery) footerDelivery.innerText = translations[lang].footerDelivery;
+  if (footerContacts) footerContacts.innerText = translations[lang].footerContacts;
+  if (emptyFavoritesTitle) emptyFavoritesTitle.innerText = translations[lang].emptyFavoritesTitle;
+  if (emptyFavoritesSubtitle) emptyFavoritesSubtitle.innerText = translations[lang].emptyFavoritesSubtitle;
 }
 
 function renderProducts() {
   const container = document.getElementById("products");
+  const emptyState = document.getElementById("products-empty-state");
   if (!container) return;
 
   container.innerHTML = "";
+  if (emptyState) emptyState.hidden = true;
 
-  products.forEach((product) => {
+  const visibleProducts = products.filter((product) => favorites.includes(product.name));
+  const dataSource = favorites.length > 0 && visibleProducts.length > 0 ? visibleProducts : products;
+
+  if (favorites.length > 0 && visibleProducts.length === 0) {
+    if (emptyState) emptyState.hidden = false;
+    return;
+  }
+
+  dataSource.forEach((product) => {
     const displayTitle = product.catalogTitle || product.name.toUpperCase();
     const displaySubtitle = product.catalogSubtitle || "ATHLETIC FIT";
     const displayLabel = product.id % 2 === 0 ? "RBC CORE COLLECTION" : "RBC DROP 01";
@@ -481,11 +525,13 @@ function updateCartCount() {
   const countEl = document.getElementById("cart-count");
   if (!countEl) return;
 
-  if (cart.length === 0) {
+  const totalQty = cart.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+
+  if (totalQty === 0) {
     countEl.style.display = "none";
   } else {
     countEl.style.display = "inline-block";
-    countEl.textContent = cart.length;
+    countEl.textContent = totalQty;
   }
 
   countEl.classList.remove("animate");
@@ -504,7 +550,8 @@ function renderCart() {
   if (cart.length === 0) {
     container.innerHTML = `
       <div class="empty-cart">
-        Корзина пуста
+        <p class="empty-cart__title">Корзина пуста</p>
+        <p class="empty-cart__subtitle">Добавьте товары из каталога</p>
       </div>
     `;
     totalEl.innerText = "Итого: 0 ₽";
@@ -617,22 +664,53 @@ async function handleCheckout() {
 
   startCheckoutButtonLoading(btn);
 
+  const nameInput = document.getElementById("customer-name");
+  const phoneInput = document.getElementById("customer-phone");
+  const addressInput = document.getElementById("customer-address");
+  const checkoutError = document.getElementById("checkout-error");
+
+  const clearFieldError = (input) => {
+    if (!input) return;
+    input.classList.remove("is-invalid");
+  };
+  const markFieldInvalid = (input) => {
+    if (!input) return;
+    input.classList.add("is-invalid");
+  };
+
+  clearFieldError(nameInput);
+  clearFieldError(phoneInput);
+  clearFieldError(addressInput);
+  if (checkoutError) checkoutError.hidden = true;
+
   if (!Array.isArray(cart) || cart.length === 0) {
     showToast("Корзина пуста");
     resetCheckoutButton(btn);
     return;
   }
 
-  const nameInput = document.getElementById("customer-name");
-  const phoneInput = document.getElementById("customer-phone");
-  const addressInput = document.getElementById("customer-address");
-
   const name = nameInput ? nameInput.value.trim() : "";
   const phone = phoneInput ? phoneInput.value.trim() : "";
   const address = addressInput ? addressInput.value.trim() : "";
 
-  if (!name || !phone || !address) {
-    showToast("Заполните все поля");
+  let errorMessage = "";
+  if (!name) {
+    markFieldInvalid(nameInput);
+    errorMessage = translations[lang].checkoutNameRequired;
+  } else if (!phone) {
+    markFieldInvalid(phoneInput);
+    errorMessage = translations[lang].checkoutPhoneRequired;
+  } else if (!address) {
+    markFieldInvalid(addressInput);
+    errorMessage = translations[lang].checkoutAddressRequired;
+  }
+
+  if (errorMessage) {
+    if (checkoutError) {
+      checkoutError.innerText = errorMessage;
+      checkoutError.hidden = false;
+    }
+    showToast(errorMessage);
     resetCheckoutButton(btn);
     return;
   }
@@ -659,6 +737,10 @@ async function handleCheckout() {
         continue;
       }
 
+      if (checkoutError) {
+        checkoutError.innerText = "Сервер оплаты временно недоступен";
+        checkoutError.hidden = false;
+      }
       showToast("Сервер оплаты временно недоступен");
       resetCheckoutButton(btn);
       return;
@@ -801,6 +883,15 @@ if (clearCartBtn) clearCartBtn.addEventListener("click", clearCart);
 
 const checkoutBtn = document.querySelector(".checkout-btn");
 if (checkoutBtn) checkoutBtn.addEventListener("click", handleCheckout);
+
+const checkoutInputs = document.querySelectorAll(".checkout-form__input");
+checkoutInputs.forEach((input) => {
+  input.addEventListener("input", () => {
+    input.classList.remove("is-invalid");
+    const checkoutError = document.getElementById("checkout-error");
+    if (checkoutError) checkoutError.hidden = true;
+  });
+});
 
 const buyBtn = document.querySelector(".buy-btn");
 if (buyBtn) {

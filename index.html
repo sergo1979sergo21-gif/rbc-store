@@ -67,6 +67,10 @@
           <p class="site-products-section__label">COLLECTION</p>
           <h2 class="site-products-section__title" id="products-section-title">Премиальная тренировочная коллекция</h2>
         </div>
+        <div id="products-empty-state" class="favorites-empty-state" hidden>
+          <p id="products-empty-title" class="favorites-empty-state__title">Нет избранных товаров</p>
+          <p id="products-empty-subtitle" class="favorites-empty-state__text">Нажмите на ❤ чтобы сохранить</p>
+        </div>
         <section class="products products-grid site-products" id="products" aria-label="Список товаров"></section>
       </section>
     </main>
@@ -146,10 +150,33 @@
           <input id="customer-name" class="checkout-form__input" placeholder="Ваше имя" />
           <input id="customer-phone" class="checkout-form__input" placeholder="Телефон" />
           <input id="customer-address" class="checkout-form__input" placeholder="Адрес доставки">
+          <p id="checkout-error" class="checkout-form__error" hidden></p>
           <button class="checkout-btn checkout-form__submit" type="button">Оформить заказ</button>
         </form>
       </div>
     </aside>
+
+    <footer class="site-footer" id="app-footer">
+      <div class="site-footer__inner">
+        <div class="site-footer__brand">
+          <p class="site-footer__logo">RBC</p>
+        </div>
+
+        <nav class="site-footer__nav" aria-label="Навигация в подвале">
+          <a id="footer-nav-catalog" href="#products">Каталог</a>
+          <a id="footer-nav-about" href="#app-footer">О бренде</a>
+          <a id="footer-nav-delivery" href="#app-footer">Доставка</a>
+          <a id="footer-nav-contacts" href="#app-footer">Контакты</a>
+        </nav>
+
+        <div class="site-footer__socials">
+          <a href="#app-footer" aria-label="Instagram">Instagram</a>
+          <a href="#app-footer" aria-label="Telegram">Telegram</a>
+        </div>
+
+        <p class="site-footer__copyright">© RBC 2025</p>
+      </div>
+    </footer>
 
     <div id="toast" class="toast"></div>
   </div>

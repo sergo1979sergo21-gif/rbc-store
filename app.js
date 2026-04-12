@@ -44,7 +44,9 @@ const translations = {
     checkoutPhoneRequired: "Введите телефон",
     checkoutAddressRequired: "Введите адрес доставки",
     checkoutSuccessTitle: "Спасибо за заказ",
-    checkoutSuccessSubtitle: "Мы свяжемся с вами в ближайшее время"
+    checkoutSuccessSubtitle: "Мы свяжемся с вами в ближайшее время",
+    checkoutCancelTitle: "Оплата отменена",
+    checkoutCancelSubtitle: "Вы можете вернуться в магазин и попробовать снова."
   },
   en: {
     shop: "Shop",
@@ -62,7 +64,9 @@ const translations = {
     checkoutPhoneRequired: "Enter phone number",
     checkoutAddressRequired: "Enter delivery address",
     checkoutSuccessTitle: "Thank you for your order",
-    checkoutSuccessSubtitle: "We will contact you shortly"
+    checkoutSuccessSubtitle: "We will contact you shortly",
+    checkoutCancelTitle: "Payment canceled",
+    checkoutCancelSubtitle: "You can return to the store and try again."
   }
 };
 
@@ -223,20 +227,18 @@ function cleanCheckoutQueryParams() {
 // SUCCESS / CANCEL (ОДНО МЕСТО)
 // =========================
 function renderCheckoutStatusPage(status) {
+  const locale = translations[lang] || translations.ru;
   const config = {
     success: {
       icon: "✅",
-      title: "Спасибо за покупку!",
-      paragraphs: [
-        "Оплата прошла успешно.",
-        "Мы уже получили ваш заказ и скоро свяжемся с вами."
-      ],
+      title: locale.checkoutSuccessTitle,
+      paragraphs: [locale.checkoutSuccessSubtitle],
       clearCart: true
     },
     cancel: {
       icon: "❌",
-      title: "Оплата отменена",
-      paragraphs: ["Вы можете вернуться в магазин и попробовать снова."],
+      title: locale.checkoutCancelTitle,
+      paragraphs: [locale.checkoutCancelSubtitle],
       clearCart: false
     }
   }[status];

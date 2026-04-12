@@ -480,6 +480,9 @@ function toggleFavoriteByKey(favoriteKey) {
   updateFavoritesCount();
   updateViewFiltersState();
   updateFavoriteTooltips();
+  if (favorites.length === 0) {
+    closeFavorites();
+  }
 }
 
 function getQuickAddVariant(productId) {
@@ -696,8 +699,11 @@ function openModal(productId) {
   if (modalSubtitle) modalSubtitle.innerText = modalMeta.subtitle;
   if (modalMaterial) modalMaterial.innerText = modalMeta.material;
   renderModalThumbnails(product);
+  closeCart();
+  closeFavorites();
   if (modal) {
     modal.classList.add("is-open");
+    syncOverlayState();
     syncBodyScrollLock();
   }
   if (modalBuyBtn) modalBuyBtn.disabled = true;
@@ -874,11 +880,9 @@ function clearCart() {
 
 function closeCart() {
   const cartEl = document.getElementById("cart");
-  const overlay = document.getElementById("overlay");
 
   if (cartEl) cartEl.classList.remove("active");
-  if (overlay) overlay.classList.remove("active");
-
+  syncOverlayState();
   syncBodyScrollLock();
   if (document.activeElement && typeof document.activeElement.blur === "function") {
     document.activeElement.blur();
@@ -1054,6 +1058,8 @@ if (cartBtn && cartEl && overlay) {
     e.preventDefault();
     e.stopPropagation();
 
+    const nav = document.querySelector("nav");
+    if (nav) nav.classList.remove("active");
     closeFavorites();
     closeModal();
     cartEl.classList.add("active");
@@ -1079,6 +1085,8 @@ if (navFavoritesBtn) {
   navFavoritesBtn.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
+    const nav = document.querySelector("nav");
+    if (nav) nav.classList.remove("active");
     openFavoritesDrawer();
   });
 }

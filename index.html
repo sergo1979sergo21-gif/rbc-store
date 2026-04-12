@@ -24,6 +24,30 @@
       <div class="site-header__inner">
         <div class="logo site-header__logo">RBC</div>
 
+        <nav id="main-nav" class="nav site-header__nav" aria-label="Основная навигация">
+          <a href="#products" class="nav-shop site-header__link">Магазин</a>
+          <a href="#app-footer" class="site-header__link">О бренде</a>
+          <a href="#app-footer" class="site-header__link">Доставка</a>
+        </nav>
+
+        <div class="site-header__actions">
+          <button class="nav-favorites site-header__favorites-button" type="button">
+            <span class="favorites-icon" aria-hidden="true">❤</span>
+            <span class="favorites-text">Избранное</span>
+            <span id="favorites-count">0</span>
+          </button>
+
+          <button class="nav-cart site-header__cart-button" type="button">
+            <span class="cart-text">Корзина</span>
+            <span id="cart-count">0</span>
+          </button>
+
+          <div class="controls site-header__controls">
+            <button type="button" onclick="setLang('ru')">RU</button>
+            <button type="button" onclick="setLang('en')">EN</button>
+          </div>
+        </div>
+
         <div
           class="burger site-header__burger"
           role="button"
@@ -32,24 +56,6 @@
           aria-expanded="false"
           aria-controls="main-nav"
         >☰</div>
-
-        <nav id="main-nav" class="nav site-header__nav" aria-label="Основная навигация">
-          <a href="#products" class="nav-shop site-header__link">Магазин</a>
-          <button class="nav-favorites site-header__favorites-button" type="button">
-            <span class="favorites-icon" aria-hidden="true">❤</span>
-            <span class="favorites-text">Избранное</span>
-            <span id="favorites-count">0</span>
-          </button>
-          <button class="nav-cart site-header__cart-button" type="button">
-            <span class="cart-text">Корзина</span>
-            <span id="cart-count">0</span>
-          </button>
-        </nav>
-
-        <div class="controls site-header__controls">
-          <button type="button" onclick="setLang('ru')">RU</button>
-          <button type="button" onclick="setLang('en')">EN</button>
-        </div>
       </div>
     </header>
 

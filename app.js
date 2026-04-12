@@ -390,6 +390,12 @@ function setLang(selectedLang) {
   renderProducts();
 }
 
+function updateHeaderScrollState() {
+  const header = document.querySelector(".site-header");
+  if (!header) return;
+  header.classList.toggle("is-scrolled", window.scrollY > 14);
+}
+
 function updateText() {
   const shop = document.querySelector(".nav-shop");
   const hero = document.querySelector(".hero-text");
@@ -1046,10 +1052,10 @@ if (closeModalBtn) {
 
 const cartEl = document.getElementById("cart");
 const overlay = document.getElementById("overlay");
-const cartBtn = document.querySelector(".nav-cart");
+const cartBtn = document.querySelector("button.nav-cart");
 const closeCartBtn = document.getElementById("close-cart");
 const favoritesDrawerEl = document.getElementById("favorites-drawer");
-const navFavoritesBtn = document.querySelector(".nav-favorites");
+const navFavoritesBtn = document.querySelector("button.nav-favorites");
 const closeFavoritesBtn = document.getElementById("close-favorites");
 const favoritesItemsEl = document.getElementById("favorites-items");
 
@@ -1193,6 +1199,28 @@ if (navShopLink) {
   });
 }
 
+const navAboutLink = document.querySelector(".nav-about");
+if (navAboutLink) {
+  navAboutLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    const footer = document.getElementById("app-footer");
+    if (footer) {
+      footer.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+}
+
+const navDeliveryLink = document.querySelector(".nav-delivery");
+if (navDeliveryLink) {
+  navDeliveryLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    const footer = document.getElementById("app-footer");
+    if (footer) {
+      footer.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+}
+
 const burger = document.querySelector(".burger");
 const nav = document.querySelector("nav");
 if (burger && nav) {
@@ -1200,6 +1228,7 @@ if (burger && nav) {
     nav.classList.toggle("active");
   });
 }
+window.addEventListener("scroll", updateHeaderScrollState, { passive: true });
 
 // =========================
 // СТАРТ ПРИЛОЖЕНИЯ
@@ -1210,4 +1239,5 @@ if (!isCheckoutStatusRendered) {
   renderProducts();
   updateCartCount();
   renderCart();
+  updateHeaderScrollState();
 }

@@ -31,14 +31,16 @@ const translations = {
   ru: {
     shop: "Магазин",
     cart: "Корзина",
-    hero: "BUILT FOR PERFORMANCE",
-    buy: "КАТАЛОГ"
+    hero: "СОЗДАНО ДЛЯ РЕЗУЛЬТАТА",
+    buy: "КАТАЛОГ",
+    productsTitle: "Премиальная тренировочная коллекция"
   },
   en: {
     shop: "Shop",
     cart: "Cart",
     hero: "BUILT FOR PERFORMANCE",
-    buy: "SHOP NOW"
+    buy: "SHOP NOW",
+    productsTitle: "Premium Training Essentials"
   }
 };
 
@@ -334,11 +336,13 @@ function updateText() {
   const hero = document.querySelector(".hero-text");
   const buyBtn = document.querySelector(".buy-btn");
   const cartLabel = document.querySelector(".cart-text");
+  const productsTitle = document.querySelector(".site-products-section__title");
 
   if (shop) shop.innerText = translations[lang].shop;
   if (hero) hero.innerText = translations[lang].hero;
   if (buyBtn) buyBtn.innerText = translations[lang].buy;
   if (cartLabel) cartLabel.innerText = translations[lang].cart;
+  if (productsTitle) productsTitle.innerText = translations[lang].productsTitle;
 }
 
 function renderProducts() {

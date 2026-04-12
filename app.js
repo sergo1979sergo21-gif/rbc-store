@@ -92,27 +92,27 @@ const products = [
     catalogColor: "GRAPHITE",
     price: 4990,
     images: {
-      front: "https://images.pexels.com/photos/6311603/pexels-photo-6311603.jpeg?auto=compress&cs=tinysrgb&w=800",
-      back: "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg?auto=compress&cs=tinysrgb&w=800",
+      front: "image/hoodie-front.png",
+      back: "image/hoodie-back.png",
       gallery: [
-        "https://images.pexels.com/photos/6311603/pexels-photo-6311603.jpeg",
-        "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg"
+        "image/hoodie-detail.png",
+        "image/hoodie-side.png"
       ]
     }
   },
   {
     id: 3,
-    name: "Шорты RBC",
-    catalogTitle: "RBC TRAINING SHORTS",
-    catalogSubtitle: "ATHLETIC CUT",
+    name: "Штаны RBC",
+    catalogTitle: "RBC TRAINING SWEATPANTS",
+    catalogSubtitle: "TAPERED FIT",
     catalogColor: "JET BLACK",
-    price: 1990,
+    price: 3590,
     images: {
-      front: "https://images.pexels.com/photos/936075/pexels-photo-936075.jpeg?auto=compress&cs=tinysrgb&w=800",
-      back: "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg?auto=compress&cs=tinysrgb&w=800",
+      front: "image/sweatpants-front.png",
+      back: "image/sweatpants-back.png",
       gallery: [
-        "https://images.pexels.com/photos/936075/pexels-photo-936075.jpeg",
-        "https://images.pexels.com/photos/6311675/pexels-photo-6311675.jpeg"
+        "image/sweatpants-detail.png",
+        "image/sweatpants-side.png"
       ]
     }
   }

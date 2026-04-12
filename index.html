@@ -8,114 +8,200 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="image/logo_3.webp">
 </head>
-<body>
+<body class="site-body">
 
-<header class="header">
-  <div class="logo">RBC</div>
+  <section id="checkout-status-screen" class="checkout-status-screen checkout-screen" hidden>
+    <div class="checkout-status-card checkout-screen__card">
+      <div id="checkout-status-icon" class="checkout-status-icon checkout-screen__icon"></div>
+      <h2 id="checkout-status-title" class="checkout-status-title checkout-screen__title"></h2>
+      <div id="checkout-status-message" class="checkout-status-message checkout-screen__message"></div>
+      <button id="checkout-status-home-btn" class="checkout-status-home-btn checkout-screen__action">Вернуться в магазин</button>
+    </div>
+  </section>
 
-  <div class="burger">☰</div>
+  <div id="app-content" class="site-app">
+    <header class="header site-header">
+      <div class="site-header__inner">
+        <div class="logo site-header__logo">RBC</div>
 
-  <nav class="nav">
-    <a href="#products" class="nav-shop">Магазин</a>
- <button class="nav-cart">
-  <span class="cart-text">Корзина</span>
-  
-  
-  
-  
-  <span id="cart-count">0</span>
-</button>
-  </nav>
+        <nav id="main-nav" class="nav site-header__nav" aria-label="Основная навигация">
+          <a href="#products" class="nav-shop site-header__link">Магазин</a>
+          <a href="about.html" class="site-header__link">О бренде</a>
+          <a href="delivery.html" class="site-header__link">Доставка</a>
+        </nav>
 
-  <div class="controls">
-    <button onclick="setLang('ru')">RU</button>
-    <button onclick="setLang('en')">EN</button>
-  </div>
-</header>
+        <div class="site-header__actions">
+          <button class="nav-favorites site-header__favorites-button" type="button">
+            <span class="favorites-icon" aria-hidden="true">❤</span>
+            <span class="favorites-text">Избранное</span>
+            <span id="favorites-count">0</span>
+          </button>
 
-<section class="hero">
- <video autoplay muted loop playsinline class="hero-video">
-  <source src="video/gym.mp4" type="video/mp4">
-</video>
+          <button class="nav-cart site-header__cart-button" type="button">
+            <span class="cart-text">Корзина</span>
+            <span id="cart-count">0</span>
+          </button>
 
-  <div class="hero-content">
-    <h2 class="hero-text"></h2>
-    <button class="buy-btn"></button>
-  </div>
-</section>
+          <div class="controls site-header__controls">
+            <button type="button" onclick="setLang('ru')">RU</button>
+            <button type="button" onclick="setLang('en')">EN</button>
+          </div>
+        </div>
 
-<section class="products" id="products"></section>
-
-<div id="modal" class="modal">
-  <div class="modal-content">
-
-    <span class="close">&times;</span>
-
-   <div class="modal-image-wrapper">
-  <img id="modal-img">
-
-  <button id="prev" class="arrow left">‹</button>
-  <button id="next" class="arrow right">›</button>
-</div>
-
-    <h2 id="modal-title"></h2>
-    <p id="modal-price"></p>
-
-    <div class="options">
-
-      <div class="sizes">
-        <p>Размер:</p>
-        <button>S</button>
-        <button>M</button>
-        <button>L</button>
+        <div
+          class="burger site-header__burger"
+          role="button"
+          tabindex="0"
+          aria-label="Открыть меню"
+          aria-expanded="false"
+          aria-controls="main-nav"
+        >☰</div>
       </div>
+    </header>
 
-      <div class="colors">
-        <p>Цвет:</p>
-        <button class="color black"></button>
-        <button class="color red"></button>
-        <button class="color white"></button>
+    <main class="site-main">
+      <section class="hero site-hero" aria-label="Главный баннер">
+        <video autoplay muted loop playsinline class="hero-video site-hero__video">
+          <source src="video/gym.mp4" type="video/mp4">
+        </video>
+        <div class="site-hero__overlay"></div>
+
+        <div class="hero-content site-hero__content">
+          <h2 class="hero-text site-hero__title"></h2>
+          <p class="site-hero__subtitle">RBC SPORTSWEAR</p>
+          <button class="buy-btn site-hero__action" type="button"></button>
+        </div>
+      </section>
+
+      <section class="site-products-section">
+        <div class="site-products-section__head">
+          <p class="site-products-section__label">COLLECTION</p>
+          <h2 class="site-products-section__title" id="products-section-title">Премиальная тренировочная коллекция</h2>
+          <button id="favorites-toggle" class="favorites-toggle-btn" type="button" aria-pressed="false" hidden>
+            Избранные в каталоге
+          </button>
+        </div>
+        <div id="products-empty-state" class="favorites-empty-state" hidden>
+          <p id="products-empty-title" class="favorites-empty-state__title">Нет избранных товаров</p>
+          <p id="products-empty-subtitle" class="favorites-empty-state__text">Нажмите на ❤ чтобы сохранить</p>
+        </div>
+        <section class="products products-grid site-products" id="products" aria-label="Список товаров"></section>
+      </section>
+    </main>
+
+    <div id="modal" class="modal product-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-content product-modal__content">
+        <span class="close product-modal__close">&times;</span>
+
+        <div class="product-modal__media-column product-modal__gallery">
+          <div class="modal-image-wrapper product-modal__image-wrapper">
+            <img id="modal-img" class="product-modal__image" alt="Изображение товара">
+            <span id="modal-shot-label" class="product-modal__shot-label">FRONT</span>
+
+            <button id="prev" class="arrow left product-modal__arrow product-modal__arrow--prev" type="button">‹</button>
+            <button id="next" class="arrow right product-modal__arrow product-modal__arrow--next" type="button">›</button>
+          </div>
+          <div id="modal-thumbnails" class="product-modal__thumbs" aria-label="Предпросмотр изображений"></div>
+        </div>
+
+        <div class="product-modal__details">
+          <p id="modal-label" class="product-modal__label">RBC DROP 01</p>
+          <h2 id="modal-title" class="product-modal__title"></h2>
+
+          <div class="product-modal__meta">
+            <p id="modal-subtitle" class="product-modal__meta-line">OVERSIZED FIT</p>
+            <p id="modal-material" class="product-modal__meta-line">HEAVYWEIGHT COTTON</p>
+          </div>
+
+          <p id="modal-price" class="product-modal__price"></p>
+
+          <div class="options product-modal__options">
+            <div class="sizes product-modal__sizes">
+              <p>Размер</p>
+              <button type="button">S</button>
+              <button type="button">M</button>
+              <button type="button">L</button>
+            </div>
+
+            <div class="colors product-modal__colors">
+              <p>Цвет</p>
+              <button class="color black" type="button"></button>
+              <button class="color red" type="button"></button>
+              <button class="color white" type="button"></button>
+            </div>
+          </div>
+
+          <button id="modal-buy" class="main-buy product-modal__buy" type="button" disabled>
+            Добавить в корзину
+          </button>
+
+          <ul class="product-modal__info">
+            <li>LIMITED DROP</li>
+            <li>PREMIUM PRINT</li>
+            <li>Доступна доставка</li>
+          </ul>
+        </div>
       </div>
-
     </div>
 
-    <button id="modal-buy"  class="main-buy" disabled>
-      В КОРЗИНУ
-    </button>
+    <div id="overlay" class="overlay site-overlay"></div>
 
-  </div> <!-- ✅ modal-content -->
-</div> 
+    <aside id="cart" class="cart cart-sidebar" aria-label="Корзина">
+      <div class="cart-header cart-sidebar__header">
+        <h2 class="cart-sidebar__title">Корзина</h2>
+      <span id="close-cart" class="cart-sidebar__close" role="button" tabindex="0" aria-label="Закрыть корзину">✕</span>
+      </div>
 
-<div id="overlay" class="overlay"></div>
+      <div id="cart-items" class="cart-sidebar__items"></div>
 
-<div id="cart" class="cart">
-  <div class="cart-header">
-    <h2>Корзина</h2>
-    <span id="close-cart">✕</span>
+      <div class="cart-sidebar__checkout">
+        <div class="cart-footer cart-sidebar__footer">
+          <button id="clear-cart" type="button">Очистить</button>
+          <p id="cart-total">Итого: 0 ₽</p>
+        </div>
+
+        <form class="checkout-form cart-sidebar__checkout-form" onsubmit="return false;">
+          <input id="customer-name" class="checkout-form__input" placeholder="Ваше имя" />
+          <input id="customer-phone" class="checkout-form__input" placeholder="Телефон" />
+          <input id="customer-address" class="checkout-form__input" placeholder="Адрес доставки">
+          <p id="checkout-error" class="checkout-form__error" hidden></p>
+          <button class="checkout-btn checkout-form__submit" type="button">Оформить заказ</button>
+        </form>
+      </div>
+    </aside>
+
+    <aside id="favorites-drawer" class="cart cart-sidebar favorites-sidebar" aria-label="Избранное">
+      <div class="cart-header cart-sidebar__header">
+        <h2 id="favorites-drawer-title" class="cart-sidebar__title">Избранное</h2>
+        <span id="close-favorites" class="cart-sidebar__close" role="button" tabindex="0" aria-label="Закрыть избранное">✕</span>
+      </div>
+      <div id="favorites-items" class="cart-sidebar__items favorites-sidebar__items"></div>
+    </aside>
+
+    <footer class="site-footer" id="app-footer">
+      <div class="site-footer__inner">
+        <div class="site-footer__brand">
+          <p class="site-footer__logo">RBC</p>
+        </div>
+
+        <nav class="site-footer__nav" aria-label="Навигация в подвале">
+          <a id="footer-nav-catalog" href="#products">Каталог</a>
+          <a id="footer-nav-about" href="about.html">О бренде</a>
+          <a id="footer-nav-delivery" href="delivery.html">Доставка</a>
+          <a id="footer-nav-contacts" href="#app-footer">Контакты</a>
+        </nav>
+
+        <div class="site-footer__socials">
+          <a href="#app-footer" aria-label="Instagram">Instagram</a>
+          <a href="https://t.me/RBC_SHOP" target="_blank" rel="noopener noreferrer" aria-label="Telegram">Telegram</a>
+        </div>
+
+        <p class="site-footer__copyright">© RBC 2025</p>
+      </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
   </div>
-
-  <div id="cart-items"></div>
-
-  <div class="cart-footer">
-    <button id="clear-cart">Очистить</button>
-    <p id="cart-total">Итого: 0 ₽</p>
-  </div>
-
-  <input id="customer-name" placeholder="Ваше имя" />
-<input id="customer-phone" placeholder="Телефон" />
-<input id="customer-address" placeholder="Адрес доставки">
-  <button class="checkout-btn">Оформить заказ</button>
-
-</div>
-
-<div id="success-modal" class="success-modal">
-  <div class="success-content">
-    <h2>✅ Заказ отправлен</h2>
-    <p>Мы скоро свяжемся с вами</p>
-    <button onclick="closeSuccess()">ОК</button>
-  </div>
-</div>
-<div id="toast" class="toast"></div>
 
 <script src="app.js"></script>
 

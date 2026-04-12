@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBC Store — О бренде</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="image/logo_3.webp">
+</head>
+<body class="site-body about-page-body">
+  <div class="site-app about-page">
+    <header class="header site-header">
+      <div class="site-header__inner">
+        <a href="index.html" class="logo site-header__logo delivery-header__logo-link">RBC</a>
+
+        <nav id="main-nav" class="nav site-header__nav" aria-label="Основная навигация">
+          <a href="index.html#products" class="site-header__link">Магазин</a>
+          <a href="about.html" class="site-header__link is-active" aria-current="page">О бренде</a>
+          <a href="delivery.html" class="site-header__link">Доставка</a>
+        </nav>
+
+        <div class="site-header__actions">
+          <a href="index.html#products" class="nav-cart delivery-header__store-btn">В магазин</a>
+        </div>
+
+        <div
+          class="burger site-header__burger"
+          role="button"
+          tabindex="0"
+          aria-label="Открыть меню"
+          aria-expanded="false"
+          aria-controls="main-nav"
+        >☰</div>
+      </div>
+    </header>
+
+    <main class="about-main">
+      <section class="about-hero" aria-label="О бренде RBC">
+        <div class="about-hero__overlay"></div>
+        <div class="about-hero__content">
+          <p class="about-hero__eyebrow">RBC CORE</p>
+          <h1 class="about-hero__title">СОЗДАНО ДЛЯ РЕЗУЛЬТАТА</h1>
+          <p class="about-hero__subtitle">RBC — это экипировка для тех, кто выбирает дисциплину вместо оправданий</p>
+        </div>
+      </section>
+
+      <section class="about-manifest reveal-up" aria-label="Манифест">
+        <h2 class="about-section-title">Манифест</h2>
+        <div class="about-manifest__text">
+          <p>Мы не делаем одежду для всех.</p>
+          <p>Мы делаем для тех, кто работает, когда остальные отдыхают.</p>
+          <p>Для тех, кто не ищет мотивацию —<br>а строит систему.</p>
+          <p>RBC — это форма для людей,<br>которые выбирают результат.</p>
+        </div>
+      </section>
+
+      <section class="about-principles reveal-up" aria-label="Принципы RBC">
+        <h2 class="about-section-title">Принципы</h2>
+        <div class="about-principles__grid">
+          <article class="about-principle">
+            <h3 class="about-principle__title">ДИСЦИПЛИНА</h3>
+            <p class="about-principle__text">Основа любого результата</p>
+          </article>
+          <article class="about-principle">
+            <h3 class="about-principle__title">КАЧЕСТВО</h3>
+            <p class="about-principle__text">Без компромиссов</p>
+          </article>
+          <article class="about-principle">
+            <h3 class="about-principle__title">ФУНКЦИЯ</h3>
+            <p class="about-principle__text">Каждая деталь имеет смысл</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="about-product reveal-up" aria-label="О продукте">
+        <h2 class="about-section-title">Продукт</h2>
+        <p class="about-product__lead">Каждая вещь создаётся как часть системы.</p>
+        <ul class="about-product__list">
+          <li>Тяжёлые ткани</li>
+          <li>Чёткий крой</li>
+          <li>Минимум лишнего</li>
+        </ul>
+      </section>
+
+      <section class="about-final reveal-up" aria-label="Финальная мысль">
+        <p class="about-final__text">RBC — это не стиль.<br>Это позиция.</p>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="app-footer">
+      <div class="site-footer__inner">
+        <div class="site-footer__brand">
+          <p class="site-footer__logo">RBC</p>
+        </div>
+
+        <nav class="site-footer__nav" aria-label="Навигация в подвале">
+          <a href="index.html#products">Каталог</a>
+          <a href="about.html" aria-current="page">О бренде</a>
+          <a href="delivery.html">Доставка</a>
+          <a href="index.html#app-footer">Контакты</a>
+        </nav>
+
+        <div class="site-footer__socials">
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">Instagram</a>
+          <a href="https://t.me/RBC_SHOP" target="_blank" rel="noopener noreferrer" aria-label="Telegram">Telegram</a>
+        </div>
+
+        <p class="site-footer__copyright">© RBC 2025</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const burger = document.querySelector(".site-header__burger");
+      const nav = document.getElementById("main-nav");
+      const header = document.querySelector(".site-header");
+      const revealItems = document.querySelectorAll(".reveal-up");
+
+      function closeNav() {
+        if (!nav || !burger) return;
+        nav.classList.remove("active");
+        burger.setAttribute("aria-expanded", "false");
+      }
+
+      function syncHeaderState() {
+        if (!header) return;
+        header.classList.toggle("is-scrolled", window.scrollY > 14);
+      }
+
+      function revealOnView() {
+        if (!("IntersectionObserver" in window)) {
+          revealItems.forEach((item) => item.classList.add("is-visible"));
+          return;
+        }
+        const observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible");
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.18, rootMargin: "0px 0px -8% 0px" }
+        );
+        revealItems.forEach(function (item) {
+          observer.observe(item);
+        });
+      }
+
+      if (burger && nav) {
+        burger.addEventListener("click", function () {
+          const isActive = nav.classList.toggle("active");
+          burger.setAttribute("aria-expanded", isActive ? "true" : "false");
+        });
+
+        burger.addEventListener("keydown", function (event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            burger.click();
+          }
+        });
+
+        document.addEventListener("click", function (event) {
+          if (!nav.classList.contains("active")) return;
+          const clickedInsideNav = nav.contains(event.target);
+          const clickedBurger = burger.contains(event.target);
+          if (!clickedInsideNav && !clickedBurger) {
+            closeNav();
+          }
+        });
+      }
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          closeNav();
+        }
+      });
+
+      syncHeaderState();
+      revealOnView();
+      window.addEventListener("scroll", syncHeaderState, { passive: true });
+      window.addEventListener("resize", function () {
+        if (window.innerWidth >= 1040) {
+          closeNav();
+        }
+      });
+    }());
+  </script>
+</body>
+</html>

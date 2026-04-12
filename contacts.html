@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBC Store — Контакты</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="image/logo_3.webp">
+</head>
+<body class="site-body contacts-page-body">
+  <div class="site-app contacts-page">
+    <header class="header site-header">
+      <div class="site-header__inner">
+        <a href="index.html" class="logo site-header__logo delivery-header__logo-link">RBC</a>
+
+        <nav id="main-nav" class="nav site-header__nav" aria-label="Основная навигация">
+          <a href="index.html#products" class="site-header__link">Магазин</a>
+          <a href="about.html" class="site-header__link">О бренде</a>
+          <a href="delivery.html" class="site-header__link">Доставка</a>
+          <a href="contacts.html" class="site-header__link is-active" aria-current="page">Контакты</a>
+        </nav>
+
+        <div
+          class="burger site-header__burger"
+          role="button"
+          tabindex="0"
+          aria-label="Открыть меню"
+          aria-expanded="false"
+          aria-controls="main-nav"
+        >☰</div>
+      </div>
+    </header>
+
+    <main class="contacts-main">
+      <section class="contacts-hero" aria-label="Контакты RBC">
+        <p class="contacts-hero__eyebrow">RBC SUPPORT</p>
+        <h1 class="contacts-hero__title">КОНТАКТЫ</h1>
+        <p class="contacts-hero__subtitle">Есть вопрос — напишите нам</p>
+      </section>
+
+      <section class="contacts-primary" aria-label="Основной способ связи">
+        <p class="contacts-primary__label">Telegram</p>
+        <a
+          class="contacts-primary__link"
+          href="https://t.me/RBC_SHOP"
+          target="_blank"
+          rel="noopener noreferrer"
+        >@RBC_SHOP</a>
+      </section>
+
+      <p class="contacts-response">Отвечаем в течение 24 часов</p>
+
+      <section class="contacts-socials" aria-label="Соцсети">
+        <a
+          class="contacts-socials__link"
+          href="https://www.instagram.com/russianbodybuildingclub?igsh=MWZmOWEyNHA5eTl5cw%3D%3D&utm_source=qr"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Instagram</a>
+        <a
+          class="contacts-socials__link"
+          href="https://t.me/RBC_SHOP"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Telegram</a>
+      </section>
+
+      <p class="contacts-trust">Мы всегда на связи<br>и готовы помочь с заказом</p>
+    </main>
+
+    <footer class="site-footer" id="app-footer">
+      <div class="site-footer__inner">
+        <div class="site-footer__brand">
+          <p class="site-footer__logo">RBC</p>
+        </div>
+
+        <nav class="site-footer__nav" aria-label="Навигация в подвале">
+          <a href="index.html#products">Каталог</a>
+          <a href="about.html">О бренде</a>
+          <a href="delivery.html">Доставка</a>
+          <a href="contacts.html" aria-current="page">Контакты</a>
+        </nav>
+
+        <div class="site-footer__socials">
+          <a
+            href="https://www.instagram.com/russianbodybuildingclub?igsh=MWZmOWEyNHA5eTl5cw%3D%3D&utm_source=qr"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+          >Instagram</a>
+          <a href="https://t.me/RBC_SHOP" target="_blank" rel="noopener noreferrer" aria-label="Telegram">Telegram</a>
+        </div>
+
+        <p class="site-footer__copyright">© RBC 2025</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const burger = document.querySelector(".site-header__burger");
+      const nav = document.getElementById("main-nav");
+      const header = document.querySelector(".site-header");
+
+      function closeNav() {
+        if (!nav || !burger) return;
+        nav.classList.remove("active");
+        burger.setAttribute("aria-expanded", "false");
+      }
+
+      function syncHeaderState() {
+        if (!header) return;
+        header.classList.toggle("is-scrolled", window.scrollY > 14);
+      }
+
+      if (burger && nav) {
+        burger.addEventListener("click", function () {
+          const isActive = nav.classList.toggle("active");
+          burger.setAttribute("aria-expanded", isActive ? "true" : "false");
+        });
+
+        burger.addEventListener("keydown", function (event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            burger.click();
+          }
+        });
+
+        document.addEventListener("click", function (event) {
+          if (!nav.classList.contains("active")) return;
+          const clickedInsideNav = nav.contains(event.target);
+          const clickedBurger = burger.contains(event.target);
+          if (!clickedInsideNav && !clickedBurger) {
+            closeNav();
+          }
+        });
+      }
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          closeNav();
+        }
+      });
+
+      syncHeaderState();
+      window.addEventListener("scroll", syncHeaderState, { passive: true });
+      window.addEventListener("resize", function () {
+        if (window.innerWidth >= 1040) {
+          closeNav();
+        }
+      });
+    }());
+  </script>
+</body>
+</html>

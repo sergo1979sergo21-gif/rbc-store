@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBC Store — Доставка и оплата</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="image/logo_3.webp">
+</head>
+<body class="site-body delivery-page-body">
+  <div class="site-app delivery-page">
+    <header class="header site-header">
+      <div class="site-header__inner">
+        <a href="index.html" class="logo site-header__logo delivery-header__logo-link">RBC</a>
+
+        <nav id="main-nav" class="nav site-header__nav" aria-label="Основная навигация">
+          <a href="index.html#products" class="site-header__link">Магазин</a>
+          <a href="about.html" class="site-header__link">О бренде</a>
+          <a href="delivery.html" class="site-header__link is-active" aria-current="page">Доставка</a>
+          <a href="contacts.html" class="site-header__link">Контакты</a>
+        </nav>
+
+        <div
+          class="burger site-header__burger"
+          role="button"
+          tabindex="0"
+          aria-label="Открыть меню"
+          aria-expanded="false"
+          aria-controls="main-nav"
+        >☰</div>
+      </div>
+    </header>
+
+    <main class="delivery-main">
+      <section class="delivery-hero" aria-label="Доставка и оплата">
+        <p class="delivery-hero__eyebrow">RBC SERVICE</p>
+        <h1 class="delivery-hero__title">ДОСТАВКА И ОПЛАТА</h1>
+        <p class="delivery-hero__subtitle">Быстро. Надёжно. Без лишних вопросов.</p>
+      </section>
+
+      <section class="delivery-grid" aria-label="Условия доставки, оплаты и возврата">
+        <article class="delivery-card">
+          <h2 class="delivery-card__title">Доставка по России</h2>
+          <div class="delivery-card__content">
+            <p>Сроки:<br><strong>3–7 дней</strong></p>
+            <p>
+              Стоимость:<br>
+              <strong>Бесплатно при заказе от 5 000 ₽</strong><br>
+              <span>Или рассчитывается при оформлении</span>
+            </p>
+          </div>
+        </article>
+
+        <article class="delivery-card">
+          <h2 class="delivery-card__title">Оплата онлайн</h2>
+          <div class="delivery-card__content">
+            <p>Банковские карты</p>
+            <p>Apple Pay / Google Pay (если доступно)</p>
+            <p>Все платежи проходят через защищённое соединение</p>
+          </div>
+        </article>
+
+        <article class="delivery-card">
+          <h2 class="delivery-card__title">Обработка заказа</h2>
+          <div class="delivery-card__content">
+            <p>Заказы обрабатываются в течение 24 часов</p>
+            <p>После оформления:</p>
+            <ul class="delivery-card__list">
+              <li>вы получите подтверждение</li>
+              <li>заказ передаётся в доставку</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="delivery-card">
+          <h2 class="delivery-card__title">Возврат и обмен</h2>
+          <div class="delivery-card__content">
+            <p>14 дней с момента получения</p>
+            <p>Товар должен быть:</p>
+            <ul class="delivery-card__list">
+              <li>без следов носки</li>
+              <li>в оригинальной упаковке</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="delivery-card delivery-card--contact">
+          <h2 class="delivery-card__title">Если есть вопросы — напишите нам</h2>
+          <a
+            class="delivery-contact-link"
+            href="https://t.me/RBC_SHOP"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Написать в Telegram"
+          >
+            Telegram: @RBC_SHOP
+          </a>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="app-footer">
+      <div class="site-footer__inner">
+        <div class="site-footer__brand">
+          <p class="site-footer__logo">RBC</p>
+        </div>
+
+        <nav class="site-footer__nav" aria-label="Навигация в подвале">
+          <a href="index.html#products">Каталог</a>
+          <a href="about.html">О бренде</a>
+          <a href="delivery.html" aria-current="page">Доставка</a>
+          <a href="contacts.html">Контакты</a>
+        </nav>
+
+        <div class="site-footer__socials">
+          <a
+            href="https://www.instagram.com/russianbodybuildingclub?igsh=MWZmOWEyNHA5eTl5cw%3D%3D&utm_source=qr"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+          >Instagram</a>
+          <a href="https://t.me/RBC_SHOP" target="_blank" rel="noopener noreferrer" aria-label="Telegram">Telegram</a>
+        </div>
+
+        <p class="site-footer__copyright">© RBC 2025</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const burger = document.querySelector(".site-header__burger");
+      const nav = document.getElementById("main-nav");
+      const header = document.querySelector(".site-header");
+
+      function closeNav() {
+        if (!nav || !burger) return;
+        nav.classList.remove("active");
+        burger.setAttribute("aria-expanded", "false");
+      }
+
+      function syncHeaderState() {
+        if (!header) return;
+        header.classList.toggle("is-scrolled", window.scrollY > 14);
+      }
+
+      if (burger && nav) {
+        burger.addEventListener("click", function () {
+          const isActive = nav.classList.toggle("active");
+          burger.setAttribute("aria-expanded", isActive ? "true" : "false");
+        });
+
+        burger.addEventListener("keydown", function (event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            burger.click();
+          }
+        });
+
+        document.addEventListener("click", function (event) {
+          if (!nav.classList.contains("active")) return;
+          const clickedInsideNav = nav.contains(event.target);
+          const clickedBurger = burger.contains(event.target);
+          if (!clickedInsideNav && !clickedBurger) {
+            closeNav();
+          }
+        });
+      }
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          closeNav();
+        }
+      });
+
+      syncHeaderState();
+      window.addEventListener("scroll", syncHeaderState, { passive: true });
+      window.addEventListener("resize", function () {
+        if (window.innerWidth >= 1040) {
+          closeNav();
+        }
+      });
+    }());
+  </script>
+</body>
+</html>

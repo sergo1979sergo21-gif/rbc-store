@@ -10,7 +10,6 @@ let selectedColor = null;
 let currentProduct = null;
 let currentImageIndex = 0;
 let isCheckoutRequestInFlight = false;
-let showFavoritesOnly = false;
 
 const SHOP_HOME_PATH = "/rbc-store/";
 
@@ -41,10 +40,17 @@ const translations = {
     footerContacts: "Контакты",
     emptyFavoritesTitle: "Нет избранных товаров",
     emptyFavoritesSubtitle: "Нажмите на ❤️ чтобы сохранить",
-    favoritesFilter: "Только избранное",
-    favoritesFilterActive: "Показаны избранные",
-    favoriteTooltip: "Добавить в избранное",
+    favoritesNav: "Избранное",
+    favoritesDrawerTitle: "Избранное",
+    favoritesEmptyTitle: "Избранное пусто",
+    favoritesEmptySubtitle: "Добавляйте товары, чтобы не потерять их",
+    favoritesToCart: "В корзину",
+    favoritesRemove: "Удалить",
+    favoriteTooltipAdd: "Добавить в избранное",
+    favoriteTooltipRemove: "Убрать из избранного",
     viewProduct: "Смотреть",
+    quickAdd: "Быстро в корзину",
+    quickAddNeedOptions: "Выберите размер и цвет",
     modalAddToCart: "Добавить в корзину",
     checkoutNameRequired: "Введите имя",
     checkoutPhoneRequired: "Введите телефон",
@@ -66,10 +72,17 @@ const translations = {
     footerContacts: "Contacts",
     emptyFavoritesTitle: "No favorite products",
     emptyFavoritesSubtitle: "Tap ❤️ to save items",
-    favoritesFilter: "Favorites only",
-    favoritesFilterActive: "Showing favorites",
-    favoriteTooltip: "Add to favorites",
+    favoritesNav: "Favorites",
+    favoritesDrawerTitle: "Favorites",
+    favoritesEmptyTitle: "Favorites is empty",
+    favoritesEmptySubtitle: "Save products so you can return later",
+    favoritesToCart: "To cart",
+    favoritesRemove: "Remove",
+    favoriteTooltipAdd: "Add to favorites",
+    favoriteTooltipRemove: "Remove from favorites",
     viewProduct: "View",
+    quickAdd: "Quick add",
+    quickAddNeedOptions: "Choose size and color",
     modalAddToCart: "Add to cart",
     checkoutNameRequired: "Enter your name",
     checkoutPhoneRequired: "Enter phone number",
@@ -225,8 +238,9 @@ function showToast(text) {
 
 function syncBodyScrollLock() {
   const cartIsOpen = Boolean(document.getElementById("cart") && document.getElementById("cart").classList.contains("active"));
+  const favoritesIsOpen = Boolean(document.getElementById("favorites-drawer") && document.getElementById("favorites-drawer").classList.contains("active"));
   const modalIsOpen = Boolean(document.getElementById("modal") && document.getElementById("modal").classList.contains("is-open"));
-  document.body.classList.toggle("no-scroll", cartIsOpen || modalIsOpen);
+  document.body.classList.toggle("no-scroll", cartIsOpen || favoritesIsOpen || modalIsOpen);
 }
 
 function cleanCheckoutQueryParams() {
@@ -381,6 +395,8 @@ function updateText() {
   const hero = document.querySelector(".hero-text");
   const buyBtn = document.querySelector(".buy-btn");
   const cartLabel = document.querySelector(".cart-text");
+  const favoritesLabel = document.querySelector(".favorites-text");
+  const favoritesDrawerTitle = document.getElementById("favorites-drawer-title");
   const productsTitle = document.querySelector(".site-products-section__title");
   const footerCatalog = document.getElementById("footer-nav-catalog");
   const footerAbout = document.getElementById("footer-nav-about");
@@ -394,6 +410,8 @@ function updateText() {
   if (hero) hero.innerText = translations[lang].hero;
   if (buyBtn) buyBtn.innerText = translations[lang].buy;
   if (cartLabel) cartLabel.innerText = translations[lang].cart;
+  if (favoritesLabel) favoritesLabel.innerText = translations[lang].favoritesNav;
+  if (favoritesDrawerTitle) favoritesDrawerTitle.innerText = translations[lang].favoritesDrawerTitle;
   if (productsTitle) productsTitle.innerText = translations[lang].productsTitle;
   if (footerCatalog) footerCatalog.innerText = translations[lang].footerCatalog;
   if (footerAbout) footerAbout.innerText = translations[lang].footerAbout;
@@ -403,19 +421,172 @@ function updateText() {
   if (emptyFavoritesSubtitle) emptyFavoritesSubtitle.innerText = translations[lang].emptyFavoritesSubtitle;
   if (modalBuyButton) modalBuyButton.innerText = translations[lang].modalAddToCart;
 
-  updateFavoritesToggleButton();
+  updateFavoritesCount();
+  renderFavoritesDrawer();
+  updateFavoriteTooltips();
+  updateViewFiltersState();
 }
 
-function updateFavoritesToggleButton() {
+function updateViewFiltersState() {
   const favoritesToggleBtn = document.getElementById("favorites-toggle");
-  if (!favoritesToggleBtn) return;
+  const emptyState = document.getElementById("products-empty-state");
+  const hasFavorites = favorites.length > 0;
+  if (!favoritesToggleBtn) {
+    if (emptyState) emptyState.hidden = true;
+    return;
+  }
 
-  const buttonLabel = showFavoritesOnly
-    ? translations[lang].favoritesFilterActive
-    : translations[lang].favoritesFilter;
-  favoritesToggleBtn.innerText = buttonLabel;
-  favoritesToggleBtn.classList.toggle("is-active", showFavoritesOnly);
-  favoritesToggleBtn.setAttribute("aria-pressed", showFavoritesOnly ? "true" : "false");
+  favoritesToggleBtn.hidden = !hasFavorites;
+  if (!hasFavorites && emptyState) emptyState.hidden = true;
+}
+
+function formatPrice(value) {
+  return `${Number(value || 0).toLocaleString("ru-RU")} ₽`;
+}
+
+function getFavoriteTooltipTexts() {
+  return {
+    add: translations[lang].favoriteTooltipAdd,
+    remove: translations[lang].favoriteTooltipRemove
+  };
+}
+
+function updateFavoriteTooltips() {
+  const tooltipTexts = getFavoriteTooltipTexts();
+  document.querySelectorAll(".like-btn").forEach((likeButton) => {
+    const isActive = likeButton.classList.contains("active");
+    likeButton.dataset.tooltip = tooltipTexts.add;
+    likeButton.dataset.tooltipActive = tooltipTexts.remove;
+    likeButton.setAttribute("aria-label", isActive ? tooltipTexts.remove : tooltipTexts.add);
+  });
+}
+
+function isFavorite(productName) {
+  return favorites.includes(productName);
+}
+
+function toggleFavoriteByKey(favoriteKey) {
+  if (!favoriteKey) return;
+
+  if (isFavorite(favoriteKey)) {
+    favorites = favorites.filter((favorite) => favorite !== favoriteKey);
+  } else {
+    favorites.push(favoriteKey);
+  }
+
+  persistFavorites();
+  renderProducts();
+  renderFavoritesDrawer();
+  updateFavoritesCount();
+  updateViewFiltersState();
+  updateFavoriteTooltips();
+}
+
+function getQuickAddVariant(productId) {
+  const existingItem = cart.find(
+    (item) => item.id === productId && typeof item.size === "string" && item.size && typeof item.color === "string" && item.color
+  );
+  if (!existingItem) return null;
+
+  return {
+    size: existingItem.size,
+    color: existingItem.color
+  };
+}
+
+function handleSafeQuickAdd(productId) {
+  const variant = getQuickAddVariant(productId);
+  if (variant) {
+    addToCart(productId, variant.size, variant.color);
+    renderCart();
+    return;
+  }
+
+  openModal(productId);
+  showToast(translations[lang].quickAddNeedOptions);
+}
+
+function updateFavoritesCount() {
+  const favoritesCountEl = document.getElementById("favorites-count");
+  if (!favoritesCountEl) return;
+
+  const totalFavorites = favorites.length;
+  if (totalFavorites === 0) {
+    favoritesCountEl.style.display = "none";
+  } else {
+    favoritesCountEl.style.display = "inline-block";
+    favoritesCountEl.textContent = totalFavorites;
+  }
+
+  favoritesCountEl.classList.remove("animate");
+  void favoritesCountEl.offsetWidth;
+  favoritesCountEl.classList.add("animate");
+}
+
+function renderFavoritesDrawer() {
+  const container = document.getElementById("favorites-items");
+  if (!container) return;
+
+  container.innerHTML = "";
+  const favoriteProducts = products.filter((product) => isFavorite(product.name));
+
+  if (favoriteProducts.length === 0) {
+    container.innerHTML = `
+      <div class="empty-cart">
+        <p class="empty-cart__title">${translations[lang].favoritesEmptyTitle}</p>
+        <p class="empty-cart__subtitle">${translations[lang].favoritesEmptySubtitle}</p>
+      </div>
+    `;
+    return;
+  }
+
+  favoriteProducts.forEach((product) => {
+    const item = document.createElement("article");
+    item.className = "favorites-item";
+    item.dataset.favoriteKey = product.name;
+
+    const cardImages = getProductCardImages(product);
+    item.innerHTML = `
+      <div class="favorites-item__media">
+        <img src="${cardImages.front}" alt="${product.name}">
+      </div>
+      <div class="favorites-item__body">
+        <p class="favorites-item__name">${product.catalogTitle || product.name}</p>
+        <p class="favorites-item__price">${formatPrice(product.price)}</p>
+        <div class="favorites-item__actions">
+          <button class="favorites-item__add" type="button" data-product-id="${product.id}">
+            ${translations[lang].favoritesToCart}
+          </button>
+          <button class="favorites-item__remove" type="button" data-favorite-key="${product.name}" aria-label="${translations[lang].favoritesRemove}">
+            ✕
+          </button>
+        </div>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function openFavoritesDrawer() {
+  const favoritesDrawer = document.getElementById("favorites-drawer");
+  if (!favoritesDrawer) return;
+
+  closeCart();
+  closeModal();
+  favoritesDrawer.classList.add("active");
+  syncOverlayState();
+  syncBodyScrollLock();
+  renderFavoritesDrawer();
+}
+
+function closeFavorites() {
+  const favoritesDrawer = document.getElementById("favorites-drawer");
+  if (favoritesDrawer) favoritesDrawer.classList.remove("active");
+  syncOverlayState();
+  syncBodyScrollLock();
+  if (document.activeElement && typeof document.activeElement.blur === "function") {
+    document.activeElement.blur();
+  }
 }
 
 function renderProducts() {
@@ -426,20 +597,14 @@ function renderProducts() {
   container.innerHTML = "";
   if (emptyState) emptyState.hidden = true;
 
-  const visibleProducts = products.filter((product) => favorites.includes(product.name));
-  const dataSource = showFavoritesOnly ? visibleProducts : products;
-
-  if (showFavoritesOnly && visibleProducts.length === 0) {
-    if (emptyState) emptyState.hidden = false;
-    return;
-  }
-
-  dataSource.forEach((product) => {
+  products.forEach((product) => {
     const displayTitle = product.catalogTitle || product.name.toUpperCase();
     const displaySubtitle = product.catalogSubtitle || "ATHLETIC FIT";
     const displayLabel = product.id % 2 === 0 ? "RBC CORE COLLECTION" : "RBC DROP 01";
-    const formattedPrice = `${Number(product.price).toLocaleString("ru-RU")} ₽`;
+    const formattedPrice = formatPrice(product.price);
     const cardImages = getProductCardImages(product);
+    const favoriteActive = isFavorite(product.name);
+    const tooltipTexts = getFavoriteTooltipTexts();
 
     container.innerHTML += `
       <article class="product-card product-grid__card catalog-card" data-product-id="${product.id}">
@@ -449,10 +614,11 @@ function renderProducts() {
         </div>
 
         <div
-          class="like-btn ${favorites.includes(product.name) ? "active" : ""}"
+          class="like-btn ${favoriteActive ? "active" : ""}"
           data-favorite-key="${product.name}"
-          data-tooltip="${translations[lang].favoriteTooltip}"
-          aria-label="${translations[lang].favoriteTooltip}"
+          data-tooltip="${tooltipTexts.add}"
+          data-tooltip-active="${tooltipTexts.remove}"
+          aria-label="${favoriteActive ? tooltipTexts.remove : tooltipTexts.add}"
         >❤</div>
 
         <div class="product-info catalog-card__content">
@@ -463,12 +629,38 @@ function renderProducts() {
           <p class="price catalog-card__price">${formattedPrice}</p>
         </div>
 
-        <button class="view-btn catalog-card__cta" onclick="event.stopPropagation(); openModal(${product.id})">
-          ${translations[lang].viewProduct}
-        </button>
+        <div class="catalog-card__actions">
+          <button class="view-btn catalog-card__cta" onclick="event.stopPropagation(); openModal(${product.id})">
+            ${translations[lang].viewProduct}
+          </button>
+          <button
+            class="quick-add-btn"
+            type="button"
+            title="${translations[lang].quickAdd}"
+            aria-label="${translations[lang].quickAdd}"
+            onclick="event.stopPropagation(); handleSafeQuickAdd(${product.id})"
+          >
+            +
+          </button>
+        </div>
       </article>
     `;
   });
+
+  updateFavoriteTooltips();
+}
+
+function syncOverlayState() {
+  const overlay = document.getElementById("overlay");
+  const cartEl = document.getElementById("cart");
+  const favoritesDrawer = document.getElementById("favorites-drawer");
+  if (!overlay) return;
+
+  const hasOpenDrawer = Boolean(
+    (cartEl && cartEl.classList.contains("active")) ||
+    (favoritesDrawer && favoritesDrawer.classList.contains("active"))
+  );
+  overlay.classList.toggle("active", hasOpenDrawer);
 }
 
 // =========================
@@ -821,20 +1013,7 @@ function handleDocumentClick(e) {
 
   if (e.target.classList.contains("like-btn")) {
     const favoriteKey = e.target.dataset.favoriteKey || "";
-    if (!favoriteKey) return;
-
-    if (favorites.includes(favoriteKey)) {
-      favorites = favorites.filter((favorite) => favorite !== favoriteKey);
-      e.target.classList.remove("active");
-    } else {
-      favorites.push(favoriteKey);
-      e.target.classList.add("active");
-    }
-
-    persistFavorites();
-    if (showFavoritesOnly) {
-      renderProducts();
-    }
+    toggleFavoriteByKey(favoriteKey);
   }
 }
 
@@ -865,15 +1044,20 @@ const cartEl = document.getElementById("cart");
 const overlay = document.getElementById("overlay");
 const cartBtn = document.querySelector(".nav-cart");
 const closeCartBtn = document.getElementById("close-cart");
+const favoritesDrawerEl = document.getElementById("favorites-drawer");
+const navFavoritesBtn = document.querySelector(".nav-favorites");
+const closeFavoritesBtn = document.getElementById("close-favorites");
+const favoritesItemsEl = document.getElementById("favorites-items");
 
 if (cartBtn && cartEl && overlay) {
   cartBtn.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
 
+    closeFavorites();
     closeModal();
     cartEl.classList.add("active");
-    overlay.classList.add("active");
+    syncOverlayState();
     syncBodyScrollLock();
     renderCart();
   });
@@ -885,12 +1069,55 @@ if (cartEl) {
   });
 }
 
-if (overlay) overlay.addEventListener("click", closeCart);
+if (favoritesDrawerEl) {
+  favoritesDrawerEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+}
+
+if (navFavoritesBtn) {
+  navFavoritesBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openFavoritesDrawer();
+  });
+}
+
+if (closeFavoritesBtn) {
+  closeFavoritesBtn.addEventListener("click", closeFavorites);
+}
+
+if (favoritesItemsEl) {
+  favoritesItemsEl.addEventListener("click", (e) => {
+    const addBtn = e.target.closest(".favorites-item__add");
+    if (addBtn) {
+      const productId = Number(addBtn.dataset.productId);
+      if (!Number.isNaN(productId)) {
+        handleSafeQuickAdd(productId);
+      }
+      return;
+    }
+
+    const removeBtn = e.target.closest(".favorites-item__remove");
+    if (removeBtn) {
+      const favoriteKey = removeBtn.dataset.favoriteKey || "";
+      toggleFavoriteByKey(favoriteKey);
+    }
+  });
+}
+
+if (overlay) {
+  overlay.addEventListener("click", () => {
+    closeCart();
+    closeFavorites();
+  });
+}
 if (closeCartBtn) closeCartBtn.addEventListener("click", closeCart);
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     closeCart();
+    closeFavorites();
     closeModal();
   }
 });
@@ -944,8 +1171,8 @@ if (buyBtn) {
 const favoritesToggleBtn = document.getElementById("favorites-toggle");
 if (favoritesToggleBtn) {
   favoritesToggleBtn.addEventListener("click", () => {
-    showFavoritesOnly = !showFavoritesOnly;
-    updateFavoritesToggleButton();
+    favoritesToggleBtn.classList.toggle("is-active");
+    favoritesToggleBtn.setAttribute("aria-pressed", favoritesToggleBtn.classList.contains("is-active") ? "true" : "false");
     renderProducts();
   });
 }

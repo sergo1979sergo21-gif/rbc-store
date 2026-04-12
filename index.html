@@ -35,6 +35,10 @@
 
         <nav id="main-nav" class="nav site-header__nav" aria-label="Основная навигация">
           <a href="#products" class="nav-shop site-header__link">Магазин</a>
+          <button class="nav-favorites site-header__favorites-button" type="button">
+            <span class="favorites-text">Избранное</span>
+            <span id="favorites-count">0</span>
+          </button>
           <button class="nav-cart site-header__cart-button" type="button">
             <span class="cart-text">Корзина</span>
             <span id="cart-count">0</span>
@@ -66,8 +70,8 @@
         <div class="site-products-section__head">
           <p class="site-products-section__label">COLLECTION</p>
           <h2 class="site-products-section__title" id="products-section-title">Премиальная тренировочная коллекция</h2>
-          <button id="favorites-toggle" class="favorites-toggle-btn" type="button" aria-pressed="false">
-            Только избранное
+          <button id="favorites-toggle" class="favorites-toggle-btn" type="button" aria-pressed="false" hidden>
+            Избранные в каталоге
           </button>
         </div>
         <div id="products-empty-state" class="favorites-empty-state" hidden>
@@ -157,6 +161,14 @@
           <button class="checkout-btn checkout-form__submit" type="button">Оформить заказ</button>
         </form>
       </div>
+    </aside>
+
+    <aside id="favorites-drawer" class="cart cart-sidebar favorites-sidebar" aria-label="Избранное">
+      <div class="cart-header cart-sidebar__header">
+        <h2 id="favorites-drawer-title" class="cart-sidebar__title">Избранное</h2>
+        <span id="close-favorites" class="cart-sidebar__close" role="button" tabindex="0" aria-label="Закрыть избранное">✕</span>
+      </div>
+      <div id="favorites-items" class="cart-sidebar__items favorites-sidebar__items"></div>
     </aside>
 
     <footer class="site-footer" id="app-footer">

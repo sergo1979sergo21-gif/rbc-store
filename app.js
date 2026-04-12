@@ -372,7 +372,7 @@ function renderProducts() {
         </div>
 
         <button class="view-btn catalog-card__cta" onclick="event.stopPropagation(); openModal(${product.id})">
-          BUY NOW
+          Купить
         </button>
       </article>
     `;

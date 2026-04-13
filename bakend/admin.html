@@ -277,6 +277,7 @@
           <div class="order-grid">
             <p class="order-line"><strong>Имя:</strong> ${order.name || "—"}</p>
             <p class="order-line"><strong>Телефон:</strong> ${order.phone || "—"}</p>
+            <p class="order-line"><strong>Telegram:</strong> ${order.telegram && String(order.telegram).trim() ? order.telegram : "—"}</p>
             <p class="order-line"><strong>Адрес:</strong> ${order.address || "—"}</p>
             <p class="order-line"><strong>Сумма:</strong> ${formatMoney(order.total)}</p>
           </div>
